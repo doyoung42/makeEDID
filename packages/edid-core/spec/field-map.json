@@ -1,0 +1,1544 @@
+{
+  "_comment": "Provenance for every field flattenEdid emits. sourceKind records how strong the evidence is: decompiled (read out of the ATP Manager JARs) > port (ported from the reference Python decoder) > corpus (inferred from ground-truth EDIDs). Consumed by scripts/spec-drift.mjs.",
+  "generated": "2026-09-02",
+  "specRoot": "reference/specs",
+  "fields": [
+    {
+      "path": "cta*.vsdb.00-00-1A.localDimming",
+      "group": "AMD FreeSync",
+      "label": "Local Dimming Disable",
+      "kind": "boolean",
+      "specDoc": "amd_freesync_v3_6c",
+      "section": "AMD FreeSync VSDB",
+      "sourceKind": "port",
+      "editable": true,
+      "note": "Ported from reference/port/decoders.py (decode_amd_vsdb)."
+    },
+    {
+      "path": "cta*.vsdb.00-00-1A.lsbHz",
+      "group": "AMD FreeSync",
+      "label": "Max LSB FreeSync Refresh (Hz)",
+      "kind": "number",
+      "specDoc": "amd_freesync_v3_6c",
+      "section": "AMD FreeSync VSDB",
+      "sourceKind": "port",
+      "editable": true,
+      "note": "Ported from reference/port/decoders.py (decode_amd_vsdb)."
+    },
+    {
+      "path": "cta*.vsdb.00-00-1A.maxHz",
+      "group": "AMD FreeSync",
+      "label": "FreeSync Max Refresh (Hz)",
+      "kind": "number",
+      "specDoc": "amd_freesync_v3_6c",
+      "section": "AMD FreeSync VSDB",
+      "sourceKind": "port",
+      "editable": true,
+      "note": "Ported from reference/port/decoders.py (decode_amd_vsdb)."
+    },
+    {
+      "path": "cta*.vsdb.00-00-1A.maxLum1",
+      "group": "AMD FreeSync",
+      "label": "Max Luminance 1 (code)",
+      "kind": "number",
+      "specDoc": "amd_freesync_v3_6c",
+      "section": "AMD FreeSync VSDB",
+      "sourceKind": "port",
+      "editable": false,
+      "note": "Ported from reference/port/decoders.py (decode_amd_vsdb)."
+    },
+    {
+      "path": "cta*.vsdb.00-00-1A.mccs",
+      "group": "AMD FreeSync",
+      "label": "MCCS VCP Support",
+      "kind": "number",
+      "specDoc": "amd_freesync_v3_6c",
+      "section": "AMD FreeSync VSDB",
+      "sourceKind": "port",
+      "editable": true,
+      "note": "Ported from reference/port/decoders.py (decode_amd_vsdb)."
+    },
+    {
+      "path": "cta*.vsdb.00-00-1A.minHz",
+      "group": "AMD FreeSync",
+      "label": "FreeSync Min Refresh (Hz)",
+      "kind": "number",
+      "specDoc": "amd_freesync_v3_6c",
+      "section": "AMD FreeSync VSDB",
+      "sourceKind": "port",
+      "editable": true,
+      "note": "Ported from reference/port/decoders.py (decode_amd_vsdb)."
+    },
+    {
+      "path": "cta*.vsdb.00-00-1A.minLum1",
+      "group": "AMD FreeSync",
+      "label": "Min Luminance 1 (cd/m2)",
+      "kind": "number",
+      "specDoc": "amd_freesync_v3_6c",
+      "section": "AMD FreeSync VSDB",
+      "sourceKind": "port",
+      "editable": false,
+      "note": "Ported from reference/port/decoders.py (decode_amd_vsdb)."
+    },
+    {
+      "path": "cta*.vsdb.00-00-1A.native",
+      "group": "AMD FreeSync",
+      "label": "Native",
+      "kind": "boolean",
+      "specDoc": "amd_freesync_v3_6c",
+      "section": "AMD FreeSync VSDB",
+      "sourceKind": "port",
+      "editable": true,
+      "note": "Ported from reference/port/decoders.py (decode_amd_vsdb)."
+    },
+    {
+      "path": "cta*.vsdb.00-00-1A.supported",
+      "group": "AMD FreeSync",
+      "label": "FreeSync Supported",
+      "kind": "boolean",
+      "specDoc": "amd_freesync_v3_6c",
+      "section": "AMD FreeSync VSDB",
+      "sourceKind": "port",
+      "editable": true,
+      "note": "Ported from reference/port/decoders.py (decode_amd_vsdb)."
+    },
+    {
+      "path": "cta*.vsdb.00-00-1A.version",
+      "group": "AMD FreeSync",
+      "label": "FreeSync Version",
+      "kind": "number",
+      "specDoc": "amd_freesync_v3_6c",
+      "section": "AMD FreeSync VSDB",
+      "sourceKind": "port",
+      "editable": true,
+      "note": "Ported from reference/port/decoders.py (decode_amd_vsdb)."
+    },
+    {
+      "path": "cta*.sad*",
+      "group": "Audio",
+      "label": "Audio Descriptor 1",
+      "kind": "string",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.sad.count",
+      "group": "Audio",
+      "label": "Audio Descriptor Count",
+      "kind": "number",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.speakerAlloc",
+      "group": "Audio",
+      "label": "Speaker Allocation",
+      "kind": "hex",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "base.chroma.blue",
+      "group": "Base EDID",
+      "label": "Blue (x, y)",
+      "kind": "string",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "base.chroma.green",
+      "group": "Base EDID",
+      "label": "Green (x, y)",
+      "kind": "string",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "base.chroma.red",
+      "group": "Base EDID",
+      "label": "Red (x, y)",
+      "kind": "string",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "base.chroma.white",
+      "group": "Base EDID",
+      "label": "White (x, y)",
+      "kind": "string",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "base.continuousFreq",
+      "group": "Base EDID",
+      "label": "Continuous Frequency",
+      "kind": "boolean",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "base.desc*.name",
+      "group": "Base EDID",
+      "label": "Product Name",
+      "kind": "string",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "base.desc*.serial",
+      "group": "Base EDID",
+      "label": "Serial (text)",
+      "kind": "string",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "base.edidVersion",
+      "group": "Base EDID",
+      "label": "EDID Version",
+      "kind": "string",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "base.extensionCount",
+      "group": "Base EDID",
+      "label": "Extension Count",
+      "kind": "number",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "base.gamma",
+      "group": "Base EDID",
+      "label": "Gamma",
+      "kind": "number",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "base.input.bitDepth",
+      "group": "Base EDID",
+      "label": "Bit Depth",
+      "kind": "enum",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "base.input.interface",
+      "group": "Base EDID",
+      "label": "Digital Interface",
+      "kind": "enum",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "base.input.kind",
+      "group": "Base EDID",
+      "label": "Video Input",
+      "kind": "enum",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "base.manufacturer",
+      "group": "Base EDID",
+      "label": "Manufacturer ID",
+      "kind": "string",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "base.preferredTiming",
+      "group": "Base EDID",
+      "label": "Preferred Timing Mode",
+      "kind": "boolean",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "base.productCode",
+      "group": "Base EDID",
+      "label": "Product Code",
+      "kind": "number",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "base.serialNumber",
+      "group": "Base EDID",
+      "label": "Serial Number",
+      "kind": "number",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "base.sizeH",
+      "group": "Base EDID",
+      "label": "Horizontal Size (cm)",
+      "kind": "number",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "base.sizeV",
+      "group": "Base EDID",
+      "label": "Vertical Size (cm)",
+      "kind": "number",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "base.srgb",
+      "group": "Base EDID",
+      "label": "sRGB Default",
+      "kind": "boolean",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "base.week",
+      "group": "Base EDID",
+      "label": "Manufacture Week",
+      "kind": "number",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "base.year",
+      "group": "Base EDID",
+      "label": "Year",
+      "kind": "number",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.basicAudio",
+      "group": "CTA-861",
+      "label": "Basic Audio",
+      "kind": "boolean",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.ext0",
+      "group": "CTA-861",
+      "label": "Video Capability",
+      "kind": "hex",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.ext120",
+      "group": "CTA-861",
+      "label": "HF-EEODB Extension Block Count",
+      "kind": "number",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.ext13",
+      "group": "CTA-861",
+      "label": "Extended tag 13",
+      "kind": "hex",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.ext14",
+      "group": "CTA-861",
+      "label": "YCbCr 4:2:0 Video",
+      "kind": "string",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.ext15",
+      "group": "CTA-861",
+      "label": "YCbCr 4:2:0 Capability Map",
+      "kind": "hex",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.ext5",
+      "group": "CTA-861",
+      "label": "Colorimetry",
+      "kind": "hex",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.nativeDtds",
+      "group": "CTA-861",
+      "label": "Native DTD Count",
+      "kind": "number",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.revision",
+      "group": "CTA-861",
+      "label": "CTA Revision",
+      "kind": "number",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.svd",
+      "group": "CTA-861",
+      "label": "Short Video Descriptors",
+      "kind": "string",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.svd.count",
+      "group": "CTA-861",
+      "label": "SVD Count",
+      "kind": "number",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.svd.vics",
+      "group": "CTA-861",
+      "label": "SVD Codes (VIC)",
+      "kind": "string",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.underscan",
+      "group": "CTA-861",
+      "label": "Underscan Supported",
+      "kind": "boolean",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.ycbcr422",
+      "group": "CTA-861",
+      "label": "YCbCr 4:2:2",
+      "kind": "boolean",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.ycbcr444",
+      "group": "CTA-861",
+      "label": "YCbCr 4:4:4",
+      "kind": "boolean",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.blockCount",
+      "group": "DisplayID",
+      "label": "Data Block Count",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "did*.db*.as*.maxHz",
+      "group": "DisplayID",
+      "label": "Adaptive-Sync · Max Refresh Rate (Hz)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.as*.minHz",
+      "group": "DisplayID",
+      "label": "Adaptive-Sync · Min Refresh Rate (Hz)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.as*.modes",
+      "group": "DisplayID",
+      "label": "Adaptive-Sync · Supported Modes",
+      "kind": "enum",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.as*.native",
+      "group": "DisplayID",
+      "label": "Adaptive-Sync · Native Panel Range",
+      "kind": "boolean",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.as*.seamless",
+      "group": "DisplayID",
+      "label": "Adaptive-Sync · Seamless Transition",
+      "kind": "boolean",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.as*.sfdDecCode",
+      "group": "DisplayID",
+      "label": "Adaptive-Sync · Max Single Frame Decrease (code)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.as*.sfdIncCode",
+      "group": "DisplayID",
+      "label": "Adaptive-Sync · Max Single Frame Increase (code)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.colorDepth",
+      "group": "DisplayID",
+      "label": "Display Parameters · Native Color Depth",
+      "kind": "enum",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.colorSpace",
+      "group": "DisplayID",
+      "label": "Display Parameters · Color Space is CIE 1976",
+      "kind": "boolean",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.gamma",
+      "group": "DisplayID",
+      "label": "Display Parameters · Gamma",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.hPixels",
+      "group": "DisplayID",
+      "label": "Display Parameters · H Pixel Count",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.hSize",
+      "group": "DisplayID",
+      "label": "Display Parameters · H Image Size (mm)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.lumInfo",
+      "group": "DisplayID",
+      "label": "Display Parameters · Luminance Info",
+      "kind": "enum",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.maxClock",
+      "group": "DisplayID",
+      "label": "Max Pixel Clock (kHz)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.maxLum",
+      "group": "DisplayID",
+      "label": "Display Parameters · Max Luminance (cd/m2)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.maxLum10",
+      "group": "DisplayID",
+      "label": "Display Parameters · Max Luminance 10% (cd/m2)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.maxRefresh",
+      "group": "DisplayID",
+      "label": "Max Refresh Rate (Hz)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.minClock",
+      "group": "DisplayID",
+      "label": "Min Pixel Clock (kHz)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.minLum",
+      "group": "DisplayID",
+      "label": "Display Parameters · Min Luminance (cd/m2)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.minRefresh",
+      "group": "DisplayID",
+      "label": "Min Refresh Rate (Hz)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.payload",
+      "group": "DisplayID",
+      "label": "Type I Timing - Detailed · Payload",
+      "kind": "hex",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "did*.db*.primary1X",
+      "group": "DisplayID",
+      "label": "Display Parameters · primary1 X (code)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.primary1Y",
+      "group": "DisplayID",
+      "label": "Display Parameters · primary1 Y (code)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.primary2X",
+      "group": "DisplayID",
+      "label": "Display Parameters · primary2 X (code)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.primary2Y",
+      "group": "DisplayID",
+      "label": "Display Parameters · primary2 Y (code)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.primary3X",
+      "group": "DisplayID",
+      "label": "Display Parameters · primary3 X (code)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.primary3Y",
+      "group": "DisplayID",
+      "label": "Display Parameters · primary3 Y (code)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.scan",
+      "group": "DisplayID",
+      "label": "Display Parameters · Scan Orientation",
+      "kind": "enum",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.seamless",
+      "group": "DisplayID",
+      "label": "Seamless Dynamic Video",
+      "kind": "boolean",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.speaker",
+      "group": "DisplayID",
+      "label": "Display Parameters · Audio Speaker Not Integrated",
+      "kind": "boolean",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.tag",
+      "group": "DisplayID",
+      "label": "Block 1: Type I Timing - Detailed",
+      "kind": "enum",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "did*.db*.tech",
+      "group": "DisplayID",
+      "label": "Display Parameters · Device Technology",
+      "kind": "enum",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.text",
+      "group": "DisplayID",
+      "label": "Product Serial / ASCII String text",
+      "kind": "string",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.vPixels",
+      "group": "DisplayID",
+      "label": "Display Parameters · V Pixel Count",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.vSize",
+      "group": "DisplayID",
+      "label": "Display Parameters · V Image Size (mm)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.whiteX",
+      "group": "DisplayID",
+      "label": "Display Parameters · white X (code)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.whiteY",
+      "group": "DisplayID",
+      "label": "Display Parameters · white Y (code)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.useCase",
+      "group": "DisplayID",
+      "label": "Product Type",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "did*.version",
+      "group": "DisplayID",
+      "label": "DisplayID Version",
+      "kind": "string",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.vsdb.00-D0-46.dv.*",
+      "group": "Dolby Vision",
+      "label": "DV per-variant fields (V0 / V1_12B / V1_15B / V2 / V4_10B / V4_20B)",
+      "kind": "number",
+      "specDoc": "",
+      "section": "Dolby Vision VSVDB",
+      "sourceKind": "decompiled",
+      "editable": true,
+      "note": "No public specification for Dolby Vision exists in this repository — none of the 43 registered standard PDFs covers it. The bit layout and every formula come from the decompiled ATP Manager DVData* model classes. The corpus contains 0 Dolby Vision blocks, so this decoder has no regression coverage; only synthetic round-trip tests."
+    },
+    {
+      "path": "cta*.vsdb.00-D0-46.payload",
+      "group": "Dolby Vision",
+      "label": "DV Payload",
+      "kind": "hex",
+      "specDoc": "",
+      "section": "Dolby Vision VSVDB",
+      "sourceKind": "decompiled",
+      "editable": true,
+      "note": "No public specification for Dolby Vision exists in this repository — none of the 43 registered standard PDFs covers it. The bit layout and every formula come from the decompiled ATP Manager DVData* model classes. The corpus contains 0 Dolby Vision blocks, so this decoder has no regression coverage; only synthetic round-trip tests."
+    },
+    {
+      "path": "cta*.vsdb.00-D0-46.variant",
+      "group": "Dolby Vision",
+      "label": "DV Variant",
+      "kind": "enum",
+      "specDoc": "",
+      "section": "Dolby Vision VSVDB",
+      "sourceKind": "decompiled",
+      "editable": false,
+      "note": "No public specification for Dolby Vision exists in this repository — none of the 43 registered standard PDFs covers it. The bit layout and every formula come from the decompiled ATP Manager DVData* model classes. The corpus contains 0 Dolby Vision blocks, so this decoder has no regression coverage; only synthetic round-trip tests."
+    },
+    {
+      "path": "cta*.vsdb.00-D0-46.version",
+      "group": "Dolby Vision",
+      "label": "DV Version",
+      "kind": "number",
+      "specDoc": "",
+      "section": "Dolby Vision VSVDB",
+      "sourceKind": "decompiled",
+      "editable": true,
+      "note": "No public specification for Dolby Vision exists in this repository — none of the 43 registered standard PDFs covers it. The bit layout and every formula come from the decompiled ATP Manager DVData* model classes. The corpus contains 0 Dolby Vision blocks, so this decoder has no regression coverage; only synthetic round-trip tests."
+    },
+    {
+      "path": "cta*.vsdb.00-0C-03.3dPresent",
+      "group": "HDMI 1.4b VSDB",
+      "label": "3D Present",
+      "kind": "boolean",
+      "specDoc": "hdmi_1_4b",
+      "section": "Vendor Specific Data Block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.vsdb.00-0C-03.ai",
+      "group": "HDMI 1.4b VSDB",
+      "label": "Supports_AI",
+      "kind": "boolean",
+      "specDoc": "hdmi_1_4b",
+      "section": "Vendor Specific Data Block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.00-0C-03.cncCinema",
+      "group": "HDMI 1.4b VSDB",
+      "label": "Content Type: Cinema",
+      "kind": "boolean",
+      "specDoc": "hdmi_1_4b",
+      "section": "Vendor Specific Data Block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.00-0C-03.cncGame",
+      "group": "HDMI 1.4b VSDB",
+      "label": "Content Type: Game",
+      "kind": "boolean",
+      "specDoc": "hdmi_1_4b",
+      "section": "Vendor Specific Data Block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.00-0C-03.cncGraphics",
+      "group": "HDMI 1.4b VSDB",
+      "label": "Content Type: Graphics",
+      "kind": "boolean",
+      "specDoc": "hdmi_1_4b",
+      "section": "Vendor Specific Data Block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.00-0C-03.cncPhoto",
+      "group": "HDMI 1.4b VSDB",
+      "label": "Content Type: Photo",
+      "kind": "boolean",
+      "specDoc": "hdmi_1_4b",
+      "section": "Vendor Specific Data Block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.00-0C-03.dc30",
+      "group": "HDMI 1.4b VSDB",
+      "label": "Deep Color 30-bit",
+      "kind": "boolean",
+      "specDoc": "hdmi_1_4b",
+      "section": "Vendor Specific Data Block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.00-0C-03.dc36",
+      "group": "HDMI 1.4b VSDB",
+      "label": "Deep Color 36-bit",
+      "kind": "boolean",
+      "specDoc": "hdmi_1_4b",
+      "section": "Vendor Specific Data Block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.00-0C-03.dc48",
+      "group": "HDMI 1.4b VSDB",
+      "label": "Deep Color 48-bit",
+      "kind": "boolean",
+      "specDoc": "hdmi_1_4b",
+      "section": "Vendor Specific Data Block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.00-0C-03.dcY444",
+      "group": "HDMI 1.4b VSDB",
+      "label": "Deep Color YCbCr 4:4:4",
+      "kind": "boolean",
+      "specDoc": "hdmi_1_4b",
+      "section": "Vendor Specific Data Block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.00-0C-03.dviDual",
+      "group": "HDMI 1.4b VSDB",
+      "label": "DVI Dual-Link",
+      "kind": "boolean",
+      "specDoc": "hdmi_1_4b",
+      "section": "Vendor Specific Data Block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.00-0C-03.hdmiVics",
+      "group": "HDMI 1.4b VSDB",
+      "label": "4K x 2K Support (HDMI VIC)",
+      "kind": "string",
+      "specDoc": "hdmi_1_4b",
+      "section": "Vendor Specific Data Block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.vsdb.00-0C-03.maxTmds",
+      "group": "HDMI 1.4b VSDB",
+      "label": "Max TMDS Clock (MHz)",
+      "kind": "number",
+      "specDoc": "hdmi_1_4b",
+      "section": "Vendor Specific Data Block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.00-0C-03.phyAddr",
+      "group": "HDMI 1.4b VSDB",
+      "label": "Source Physical Address",
+      "kind": "string",
+      "specDoc": "hdmi_1_4b",
+      "section": "Vendor Specific Data Block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.C4-5D-D8.allm",
+      "group": "HDMI Forum VSDB (2.1)",
+      "label": "ALLM",
+      "kind": "boolean",
+      "specDoc": "hdmi_2_1",
+      "section": "HF-VSDB / Sink Capability Data Structure",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.C4-5D-D8.cinemaVrr",
+      "group": "HDMI Forum VSDB (2.1)",
+      "label": "Cinema VRR",
+      "kind": "boolean",
+      "specDoc": "hdmi_2_1",
+      "section": "HF-VSDB / Sink Capability Data Structure",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.C4-5D-D8.dc30_420",
+      "group": "HDMI Forum VSDB (2.1)",
+      "label": "DC 30-bit 4:2:0",
+      "kind": "boolean",
+      "specDoc": "hdmi_2_1",
+      "section": "HF-VSDB / Sink Capability Data Structure",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.C4-5D-D8.dc36_420",
+      "group": "HDMI Forum VSDB (2.1)",
+      "label": "DC 36-bit 4:2:0",
+      "kind": "boolean",
+      "specDoc": "hdmi_2_1",
+      "section": "HF-VSDB / Sink Capability Data Structure",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.C4-5D-D8.dc48_420",
+      "group": "HDMI Forum VSDB (2.1)",
+      "label": "DC 48-bit 4:2:0",
+      "kind": "boolean",
+      "specDoc": "hdmi_2_1",
+      "section": "HF-VSDB / Sink Capability Data Structure",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.C4-5D-D8.dsc1p2",
+      "group": "HDMI Forum VSDB (2.1)",
+      "label": "DSC 1.2a",
+      "kind": "boolean",
+      "specDoc": "hdmi_2_1",
+      "section": "HF-VSDB / Sink Capability Data Structure",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.C4-5D-D8.dscChunk",
+      "group": "HDMI Forum VSDB (2.1)",
+      "label": "DSC Total Chunk kBytes",
+      "kind": "number",
+      "specDoc": "hdmi_2_1",
+      "section": "HF-VSDB / Sink Capability Data Structure",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.C4-5D-D8.dscMaxFrl",
+      "group": "HDMI Forum VSDB (2.1)",
+      "label": "DSC Max FRL Rate",
+      "kind": "enum",
+      "specDoc": "hdmi_2_1",
+      "section": "HF-VSDB / Sink Capability Data Structure",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.C4-5D-D8.dscMaxSlices",
+      "group": "HDMI Forum VSDB (2.1)",
+      "label": "DSC Max Slices",
+      "kind": "enum",
+      "specDoc": "hdmi_2_1",
+      "section": "HF-VSDB / Sink Capability Data Structure",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.C4-5D-D8.dscNative420",
+      "group": "HDMI Forum VSDB (2.1)",
+      "label": "DSC Native 4:2:0",
+      "kind": "boolean",
+      "specDoc": "hdmi_2_1",
+      "section": "HF-VSDB / Sink Capability Data Structure",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.C4-5D-D8.fva",
+      "group": "HDMI Forum VSDB (2.1)",
+      "label": "FVA",
+      "kind": "boolean",
+      "specDoc": "hdmi_2_1",
+      "section": "HF-VSDB / Sink Capability Data Structure",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.C4-5D-D8.maxFrl",
+      "group": "HDMI Forum VSDB (2.1)",
+      "label": "Max FRL Rate",
+      "kind": "enum",
+      "specDoc": "hdmi_2_1",
+      "section": "HF-VSDB / Sink Capability Data Structure",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.C4-5D-D8.maxTmds",
+      "group": "HDMI Forum VSDB (2.1)",
+      "label": "Max TMDS Character Rate (MHz)",
+      "kind": "number",
+      "specDoc": "hdmi_2_1",
+      "section": "HF-VSDB / Sink Capability Data Structure",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.C4-5D-D8.qms",
+      "group": "HDMI Forum VSDB (2.1)",
+      "label": "QMS",
+      "kind": "boolean",
+      "specDoc": "hdmi_2_1",
+      "section": "HF-VSDB / Sink Capability Data Structure",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.C4-5D-D8.scdc",
+      "group": "HDMI Forum VSDB (2.1)",
+      "label": "SCDC Present",
+      "kind": "boolean",
+      "specDoc": "hdmi_2_1",
+      "section": "HF-VSDB / Sink Capability Data Structure",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.C4-5D-D8.version",
+      "group": "HDMI Forum VSDB (2.1)",
+      "label": "Version",
+      "kind": "number",
+      "specDoc": "hdmi_2_1",
+      "section": "HF-VSDB / Sink Capability Data Structure",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.C4-5D-D8.vrrMax",
+      "group": "HDMI Forum VSDB (2.1)",
+      "label": "VRR Max (Hz)",
+      "kind": "number",
+      "specDoc": "hdmi_2_1",
+      "section": "HF-VSDB / Sink Capability Data Structure",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.vsdb.C4-5D-D8.vrrMin",
+      "group": "HDMI Forum VSDB (2.1)",
+      "label": "VRR Min (Hz)",
+      "kind": "number",
+      "specDoc": "hdmi_2_1",
+      "section": "HF-VSDB / Sink Capability Data Structure",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.ext6.avgLum",
+      "group": "HDR",
+      "label": "Max Frame-Avg Luminance (code)",
+      "kind": "number",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.ext6.eotf",
+      "group": "HDR",
+      "label": "HDR EOTF",
+      "kind": "string",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.ext6.maxLum",
+      "group": "HDR",
+      "label": "Max Luminance (code)",
+      "kind": "number",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.ext6.minLum",
+      "group": "HDR",
+      "label": "Min Luminance (code)",
+      "kind": "number",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.vsdb.90-84-8B.appVersion",
+      "group": "HDR10+",
+      "label": "HDR10+ Application Version",
+      "kind": "number",
+      "specDoc": "",
+      "section": "HDR10+ VSVDB",
+      "sourceKind": "corpus",
+      "editable": true,
+      "note": "Bit layout derived from 297 corpus EDIDs cross-checked against their decoded reports; no spec PDF is registered for HDR10+."
+    },
+    {
+      "path": "cta*.vsdb.90-84-8B.ffPeakIndex",
+      "group": "HDR10+",
+      "label": "HDR10+ Full-Frame Peak Luminance Index",
+      "kind": "number",
+      "specDoc": "",
+      "section": "HDR10+ VSVDB",
+      "sourceKind": "corpus",
+      "editable": true,
+      "note": "Bit layout derived from 297 corpus EDIDs cross-checked against their decoded reports; no spec PDF is registered for HDR10+."
+    },
+    {
+      "path": "cta*.vsdb.90-84-8B.peakIndex",
+      "group": "HDR10+",
+      "label": "HDR10+ Peak Luminance Index",
+      "kind": "number",
+      "specDoc": "",
+      "section": "HDR10+ VSVDB",
+      "sourceKind": "corpus",
+      "editable": true,
+      "note": "Bit layout derived from 297 corpus EDIDs cross-checked against their decoded reports; no spec PDF is registered for HDR10+."
+    },
+    {
+      "path": "cta*.ext35_*.t8.codeSize",
+      "group": "Timing",
+      "label": "Type VIII Code Size (bytes)",
+      "kind": "number",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.ext35_*.t8.codeType",
+      "group": "Timing",
+      "label": "Type VIII Code Type",
+      "kind": "enum",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.ext35_*.t8.codes",
+      "group": "Timing",
+      "label": "Type VIII Timing Codes",
+      "kind": "string",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.ext35_*.t8.count",
+      "group": "Timing",
+      "label": "Type VIII Timing Code Count",
+      "kind": "number",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.ext35_*.t8.revision",
+      "group": "Timing",
+      "label": "Type VIII Block Revision",
+      "kind": "number",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.ext35_*.t8.y420",
+      "group": "Timing",
+      "label": "Type VIII Supports YCbCr 4:2:0",
+      "kind": "boolean",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.t8.codeSize",
+      "group": "Timing",
+      "label": "Type VIII Code Size (bytes)",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.t8.codeType",
+      "group": "Timing",
+      "label": "Type VIII Code Type",
+      "kind": "enum",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.t8.codes",
+      "group": "Timing",
+      "label": "Type VIII Timing Codes",
+      "kind": "string",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.t8.count",
+      "group": "Timing",
+      "label": "Type VIII Timing Code Count",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "did*.db*.t8.revision",
+      "group": "Timing",
+      "label": "Type VIII Block Revision",
+      "kind": "number",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "did*.db*.t8.y420",
+      "group": "Timing",
+      "label": "Type VIII Supports YCbCr 4:2:0",
+      "kind": "boolean",
+      "specDoc": "displayid_v2_1a",
+      "section": "DisplayID 2.0 data blocks",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "base.desc*.dtd",
+      "group": "Timings",
+      "label": "Descriptor 1 (DTD)",
+      "kind": "string",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "base.desc*.dtd.clock",
+      "group": "Timings",
+      "label": "Descriptor 1 Pixel Clock (kHz)",
+      "kind": "number",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "base.desc*.hRange",
+      "group": "Timings",
+      "label": "Horizontal Rate (kHz)",
+      "kind": "string",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "base.desc*.maxClock",
+      "group": "Timings",
+      "label": "Max Pixel Clock (MHz)",
+      "kind": "number",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "base.desc*.vRange",
+      "group": "Timings",
+      "label": "Vertical Rate (Hz)",
+      "kind": "string",
+      "specDoc": "e_edid_a2",
+      "section": "Base EDID block",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.dtd*",
+      "group": "Timings",
+      "label": "CTA DTD 1",
+      "kind": "string",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    },
+    {
+      "path": "cta*.dtd*.clock",
+      "group": "Timings",
+      "label": "CTA DTD 1 Pixel Clock (kHz)",
+      "kind": "number",
+      "specDoc": "cta_861_h",
+      "section": "CTA-861 extension and data blocks",
+      "sourceKind": "decompiled",
+      "editable": false
+    }
+  ]
+}

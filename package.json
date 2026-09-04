@@ -1,0 +1,28 @@
+{
+  "name": "edid-workbench",
+  "private": true,
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "EDID/DisplayID editor with a model-vs-spec matrix, replacing the EDID authoring side of Quantum Data ATP Manager",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "start": "node apps/server/dist/index.js",
+    "dev:api": "node apps/server/dist/index.js",
+    "dev:web": "npm run dev --workspace @edid/web",
+    "dev": "npm run dev --workspace @edid/web",
+    "test": "node --test test/*.test.mjs",
+    "test:corpus": "node --test test/corpus/*.test.mjs",
+    "test:all": "node --test test/*.test.mjs test/corpus/*.test.mjs test/integration/*.test.mjs",
+    "spec:drift": "node scripts/spec-drift.mjs",
+    "spec:drift:accept": "node scripts/spec-drift.mjs --write",
+    "test:integration": "node --test test/integration/*.test.mjs",
+    "audit": "node scripts/field-audit.mjs"
+  }
+}

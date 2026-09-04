@@ -1,0 +1,65 @@
+# ─────────────────────────────────────────────────────────── build & tooling
+node_modules/
+dist/
+*.tsbuildinfo
+*.log
+
+# ───────────────────────────────────────────────────────────────── secrets
+# Never commit these, and never print their values into logs or transcripts.
+*.env
+*.env.*
+!*.env.example
+/key.env.txt
+
+# ─────────────────────────────────────────────────────────── editor / OS noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DATA THAT DOES NOT GO TO A REMOTE
+#
+# Everything below is either confidential, licensed to this site only, or
+# third-party material we have no right to redistribute. This is independent
+# of the repository's own MIT license (see LICENSE) — these are someone
+# else's material, or in-house data, and stay out regardless. The code in
+# this repository is designed to run without it: the tests that need it skip
+# with a message (see test/fixtures.mjs and test/corpus/loader.mjs), and
+# scripts/spec-drift.mjs reports an empty registry.
+#
+# Flip any single line here only with a deliberate decision to redistribute
+# that specific material.
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Every EDID working file, wherever it ends up. This is the actual data format
+# (see README) — belt-and-suspenders on top of the path-based rules below, so
+# a `.ddc` dropped anywhere by accident (repo root during manual testing, a
+# stray export, a future test fixture) can never be committed by mistake.
+*.ddc
+
+# Ground-truth corpus — 1,397 production monitor EDIDs, internal EDID List
+# spec spreadsheets (two of them DRM-locked) and competitor captures.
+/corpus/
+
+# Everything under reference/ is evidence, not source:
+#   specs/       43 VESA / CTA / HDMI standard PDFs, licensed per-seat, plus
+#                the LLM extractions derived from them
+#   decompiled/  Quantum Data ATP Manager plugin JARs run through CFR
+#   samples/     30 DATAOBJ XML fixtures shipped with the ATP Manager instrument
+#   rules/       in-house EDID review checklist
+#   port/        the reference Python decoder this project ported from
+# The pattern is `/reference/*`, not `/reference/`, so that one subfolder can
+# be re-included later: git cannot un-ignore anything inside an excluded
+# *directory*. To make `npm test` runnable on a private clone, append
+#     !/reference/samples/
+/reference/*
+
+# Third-party binaries (cfr.jar — the Java decompiler, MIT).
+/tools/
+
+# Working EDID files. projects/ is the server's default working directory,
+# so the folder itself is tracked while its contents are not.
+/projects/*
+!/projects/.gitkeep

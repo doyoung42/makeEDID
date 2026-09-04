@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22.x', '24.x']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - run: npm ci
+
+      # tsc runs across every workspace, so this is the type check as well as
+      # the build. It is what catches an unhandled case in a discriminated
+      # union before it reaches the UI.
+      - run: npm run build
+
+      # The corpus and the vendor fixtures are not in the repository (see
+      # .gitignore), so the cases that need them skip and the self-contained
+      # unit tests still run. Run `npm run test:all` locally, where the data is.
+      - run: npm test
