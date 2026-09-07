@@ -8,8 +8,9 @@ import {
   addDisplayIdBlock, setDescriptorKind, setListCount,
   ctaBlockCatalogue, displayIdBlockCatalogue,
   DESCRIPTOR_KINDS, ctaFreeBytes, displayIdFreeBytes,
-  structureTargetFor, removeAtPath, addTargetFor,
+  structureTargetFor, removeAtPath, addTargetFor, moveAtPath, canMoveAtPath,
 } from "../packages/edid-core/dist/structure.js";
+import { applyField } from "../packages/edid-core/dist/applyField.js";
 
 /*
  * Structural editing: adding and removing blocks rather than changing values.
@@ -238,7 +239,13 @@ test("X12: every block row resolves to the block it stands for, and can be remov
   };
 
   const groups = flattenEdid(build()).filter((f) => f.role === "block" || f.role === "group");
-  const removable = groups.filter((g) => structureTargetFor(build(), g.path) !== null);
+  const removable = groups.filter((g) => {
+    const target = structureTargetFor(build(), g.path);
+    // A standard timing slot is addressable (for X18's move test) but "removed"
+    // by unchecking its own `used` field via applyField, not through here —
+    // there's no block to detach.
+    return target !== null && target.kind !== "standard-timing";
+  });
   assert.ok(removable.length >= 10,
     "expected 10+ addressable structure rows, got " + removable.length
       + " of " + groups.length);
@@ -281,4 +288,102 @@ test("X14: a + on an extension row offers the right catalogue", () => {
   assert.deepEqual(addTargetFor(edid, "block1"), { kind: "cta", extIndex: 0 });
   assert.deepEqual(addTargetFor(edid, "block2"), { kind: "displayid", extIndex: 1 });
   assert.equal(addTargetFor(edid, "block0"), null, "nothing is added into the base block");
+});
+
+test("X15: moving a data block reorders it without touching byte count", () => {
+  const edid = createBlankEdid();
+  addExtension(edid, "cta");
+  addCtaBlock(edid, 0, "video");
+  addCtaBlock(edid, 0, "audio");
+  addCtaBlock(edid, 0, "speaker");
+  const before = encodeEdid(edid);
+
+  // Video is at index 0; move it down past Audio.
+  assert.equal(moveAtPath(edid, "cta0.vdb", "down"), true);
+  const after = encodeEdid(edid);
+
+  assert.equal(after.length, before.length, "reordering must not change the byte count");
+  assert.ok(checksumsValid(after));
+  const kinds = edid.extensions[0].dataBlocks.map((b) => b.kind);
+  assert.deepEqual(kinds, ["audio", "video", "speaker-allocation"], "video moved past audio");
+
+  // Moving the first item up, or the last item down, is a no-op refusal.
+  assert.equal(moveAtPath(edid, "cta0.sab", "down"), false, "sab is already last");
+});
+
+test("X16: moving an extension swaps its content with the neighbour", () => {
+  const edid = createBlankEdid();
+  addExtension(edid, "cta");
+  addExtension(edid, "displayid");
+  assert.equal(edid.extensions[0].kind, "cta");
+  assert.equal(edid.extensions[1].kind, "displayid");
+
+  assert.equal(moveAtPath(edid, "block2", "up"), true);
+  assert.equal(edid.extensions[0].kind, "displayid");
+  assert.equal(edid.extensions[1].kind, "cta");
+
+  const bytes = encodeEdid(edid);
+  assert.equal(bytes.length, 384);
+  assert.ok(checksumsValid(bytes));
+  assert.equal(moveAtPath(edid, "block1", "up"), false, "block1 is already first");
+});
+
+test("X17: moving a descriptor swaps its content, byte-for-byte reproducible", () => {
+  const edid = createBlankEdid();
+  applyField(edid, "base.desc2.name", "SWAP ME");
+  const before = flattenEdid(edid).find((f) => f.path === "base.desc0.dtd.hActive").value;
+
+  assert.equal(moveAtPath(edid, "base.desc0", "down"), true);
+  const bytes = encodeEdid(edid);
+  assert.ok(checksumsValid(bytes));
+
+  const round = decodeEdid(bytes);
+  const fields = flattenEdid(round);
+  // The DTD that was in slot 0 is now in slot 1; the name that was in slot 2 is unmoved.
+  assert.equal(fields.find((f) => f.path === "base.desc1.dtd.hActive").value, before);
+  assert.equal(fields.find((f) => f.path === "base.desc2.name").value, "SWAP ME");
+  assert.deepEqual(Array.from(encodeEdid(round)), Array.from(bytes), "not byte-stable");
+});
+
+test("X18: moving a standard timing swaps its slot without changing block length", () => {
+  const edid = createBlankEdid();
+  applyField(edid, "base.std0.used", true);
+  applyField(edid, "base.std0.hActive", 1024);
+  applyField(edid, "base.std1.used", true);
+  applyField(edid, "base.std1.hActive", 1280);
+  const before = encodeEdid(edid);
+
+  assert.equal(moveAtPath(edid, "base.std0", "down"), true);
+  const after = encodeEdid(edid);
+  assert.equal(after.length, before.length);
+  assert.ok(checksumsValid(after));
+
+  const fields = flattenEdid(decodeEdid(after));
+  assert.equal(fields.find((f) => f.path === "base.std0.hActive").value, 1280);
+  assert.equal(fields.find((f) => f.path === "base.std1.hActive").value, 1024);
+});
+
+test("X19: moveAtPath refuses paths it cannot resolve, and out-of-bounds moves", () => {
+  const edid = createBlankEdid();
+  assert.equal(moveAtPath(edid, "nonsense.path", "up"), false);
+  assert.equal(moveAtPath(edid, "block0", "up"), false, "the base block has no move");
+  assert.equal(moveAtPath(edid, "base.std0", "up"), false, "std0 is already first");
+});
+
+test("X20: canMoveAtPath is a cheap bounds check, agreeing with moveAtPath", () => {
+  const edid = createBlankEdid();
+  addExtension(edid, "cta");
+  addCtaBlock(edid, 0, "video");
+  addCtaBlock(edid, 0, "audio");
+
+  assert.equal(canMoveAtPath(edid, "cta0.vdb", "up"), false, "first item, no up");
+  assert.equal(canMoveAtPath(edid, "cta0.vdb", "down"), true);
+  assert.equal(canMoveAtPath(edid, "cta0.adb", "down"), false, "last item, no down");
+  assert.equal(canMoveAtPath(edid, "cta0.adb", "up"), true);
+
+  // It must not have mutated anything while checking.
+  const kinds = edid.extensions[0].dataBlocks.map((b) => b.kind);
+  assert.deepEqual(kinds, ["video", "audio"]);
+
+  assert.equal(canMoveAtPath(edid, "nonsense.path", "up"), false);
 });

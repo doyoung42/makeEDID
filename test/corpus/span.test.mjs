@@ -12,6 +12,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   decodeEdid, encodeEdid, flattenEdid, applyField, isFieldEditable, BLOCK_SIZE, computeLayout,
+  describeInput,
 } from "../../packages/edid-core/dist/index.js";
 import { loadCorpus, corpusAvailable, CORPUS_ROOT } from "./loader.mjs";
 
@@ -29,14 +30,37 @@ function perturb(field) {
     case "boolean": return !v;
     case "number": {
       if (typeof v !== "number") return null;
-      // Step down when possible: most numeric fields have a low ceiling.
+      // Fields with a known, tight range (e.g. a chromaticity coordinate
+      // bounded to [0, 0.999]) can't take a blind "-1" — that throws as
+      // out-of-range and the shape never gets exercised at all. Where the
+      // registry knows the range, stay inside it; otherwise fall back to the
+      // old step-down, which suits the many fields with a low ceiling.
+      const input = describeInput(field.path, field.kind);
+      if (input?.control === "number" && input.min !== undefined && input.max !== undefined) {
+        const down = v - Math.min(1, v - input.min);
+        if (down >= input.min && down !== v) return down;
+        const up = v + Math.min(1, input.max - v);
+        return up <= input.max && up !== v ? up : null;
+      }
       return v > 0 ? v - 1 : 1;
     }
     case "string": {
       if (typeof v !== "string" || v.length === 0) return null;
       return v[0] === "A" ? "B" + v.slice(1) : "A" + v.slice(1);
     }
-    default: return null;   // enum and hex have no safe generic perturbation
+    case "hex": {
+      // Two conventions coexist (see packages/edid-core/CLAUDE.md): "0x"-prefixed
+      // single values (productCode, byte3) and bare hex-digit payloads (raw
+      // blocks). Cycling the *last* hex digit works for both without needing to
+      // know which — it never touches an "0x" prefix, which isn't a hex digit.
+      if (typeof v !== "string") return null;
+      const m = /[0-9a-fA-F](?!.*[0-9a-fA-F])/.exec(v);
+      if (!m) return null;
+      const i = m.index;
+      const d = parseInt(v[i], 16);
+      return v.slice(0, i) + (d === 0 ? 1 : d - 1).toString(16) + v.slice(i + 1);
+    }
+    default: return null;   // enum has no safe generic perturbation
   }
 }
 
@@ -158,6 +182,9 @@ test("S1: editing a field changes only the bytes its span claims", { skip }, () 
   const QUANTISED = new Set([
     "base.desc*.dtd.clock", "base.desc*.maxClock", "cta*.dtd*.clock",
     "cta*.vsdb.00-0C-03.maxTmds", "cta*.vsdb.C4-5D-D8.maxTmds",
+    // HDR Static Metadata luminance: 8-bit code over 50 * 2^(CV/32), so a
+    // ±1 cd/m² nudge near a rounding boundary can land on the same code.
+    "cta*.ext*.maxLum", "cta*.ext*.avgLum", "cta*.ext*.minLum",
   ]);
   const silent = [...noOpShapes.keys()].filter((s2) => !QUANTISED.has(s2)).sort();
   assert.deepEqual(silent, [],

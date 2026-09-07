@@ -12,11 +12,13 @@ import {
 } from "./vsdb/index.js";
 import { describeVic } from "./vic.js";
 import { CtaExtendedTag } from "./cta.js";
+import { hdrMaxAvgLuminanceCdm2, hdrMinLuminanceCdm2 } from "./hdr.js";
 import {
   DidTag, didTagLabel, parseDisplayParamsV2, parseAdaptiveSync, parseTiledTopology,
   formatContainerId, halfToFloat, coordToCie, imageSizeMm,
   SCAN_ORIENTATION, LUMINANCE_INFO, NATIVE_COLOR_DEPTH, DISPLAY_DEVICE_TECH,
   ADAPTIVE_SYNC_MODES, singleFrameDeltaPercent, type ColorCoord12,
+  PRIMARY_USE_CASE_LABEL, PRODUCT_TYPE_LABEL,
 } from "./displayid2.js";
 import {
   parseTypeITiming, parseTypeVIITiming, parseTypeXTiming, TYPE_X_BASE_LENGTH,
@@ -205,7 +207,11 @@ export function flattenEdid(edid: Edid, bytes?: Uint8Array): SpecField[] {
 function flattenBase(edid: Edid, add: Emitter, layout: EdidLayout): void {
   const b = edid.base;
   add.at(8, 2, "base.manufacturer", GROUP.base, "Manufacturer ID", b.manufacturerId);
-  add.at(10, 2, "base.productCode", GROUP.base, "Product Code", b.productCode, "number");
+  // Displayed and edited as hex ("0x7042"), matching how the field is actually
+  // documented and quoted (VESA spec, panel datasheets). `applyField`'s
+  // `clampInt` needs no change: `Number("0x7042")` already parses hex natively.
+  add.at(10, 2, "base.productCode", GROUP.base, "Product Code",
+    "0x" + b.productCode.toString(16).toUpperCase().padStart(4, "0"), "hex");
   add.at(12, 4, "base.serialNumber", GROUP.base, "Serial Number", b.serialNumber, "number");
   add.at(16, 1, "base.week", GROUP.base, b.modelYearFlag ? "Model Year Flag" : "Manufacture Week",
     b.modelYearFlag ? "model year" : b.manufactureWeek, "number");
@@ -232,8 +238,10 @@ function flattenBase(edid: Edid, add: Emitter, layout: EdidLayout): void {
 
   const c = b.chromaticity;
   const coord = (v: number) => (v / 1024).toFixed(4);
-  // The 10-bit raw codes are what can actually be written; the "x, y" rows above
-  // stay as the readable summary.
+  // Two editable paths to the same byte: the 10-bit raw code (`...Code`, the
+  // AMD FreeSync luminance naming convention) and the decoded CIE value —
+  // writing either one lands on the same bits. The "x, y" rows above stay as
+  // a read-only at-a-glance pair.
   // [key, label, value, sharedLowByte, highByte] — the 2 low bits live in byte
   // 25 (red/green) or 26 (blue/white), the 8 high bits in the coordinate's own
   // byte, so each span runs from the shared byte through the high byte.
@@ -249,8 +257,11 @@ function flattenBase(edid: Edid, add: Emitter, layout: EdidLayout): void {
   add.at(26, 6, "base.chroma.white", GROUP.base, "White (x, y)", coord(c.whiteX) + ", " + coord(c.whiteY));
 
   for (const [key, label, value, lowByte, highByte] of CHROMA) {
-    add.at(lowByte, highByte - lowByte + 1, "base.chroma." + key, GROUP.base,
+    const len = highByte - lowByte + 1;
+    add.at(lowByte, len, "base.chroma." + key + "Code", GROUP.base,
       label + " (10-bit code)", value, "number");
+    add.at(lowByte, len, "base.chroma." + key, GROUP.base,
+      label + " (CIE)", coord(value), "number");
   }
 
   add.at(126, 1, "base.extensionCount", GROUP.base, "Extension Count", b.extensionCount, "number");
@@ -382,7 +393,19 @@ function flattenDtd(d: DetailedTimingDescriptor, key: string, label: string, add
   add.at(17, 1, key + ".interlaced", g, pre + "Interlaced", d.interlaced, "boolean");
   add.at(17, 1, key + ".stereo", g, pre + "Stereo Mode", d.stereo, "enum");
   add.at(17, 1, key + ".syncType", g, pre + "Sync Type", d.syncType, "enum");
-  add.at(17, 1, key + ".syncFlags", g, pre + "Sync Flags", d.syncFlags, "enum");
+  // Byte 17 bits 2:1 mean different things depending on Sync Type. For
+  // "Digital separate" (3) — by far the common case — bit1/bit2 are literally
+  // H/V sync polarity, so that's exposed as checkboxes rather than a raw
+  // 2-bit number. For the other three sync types the same two bits mean
+  // something else (serration, sync-on-RGB), so the label says so rather than
+  // implying a polarity that may not apply.
+  const digitalSeparate = d.syncType === 3;
+  add.at(17, 1, key + ".hSyncPositive", g,
+    pre + (digitalSeparate ? "H Sync Positive" : "Sync Flags Bit 0 (raw — meaning depends on Sync Type)"),
+    (d.syncFlags & 1) === 1, "boolean");
+  add.at(17, 1, key + ".vSyncPositive", g,
+    pre + (digitalSeparate ? "V Sync Positive" : "Sync Flags Bit 1 (raw — meaning depends on Sync Type)"),
+    (d.syncFlags & 2) === 2, "boolean");
 }
 
 /**
@@ -538,15 +561,20 @@ function flattenCtaBlock(
   switch (block.kind) {
     case "video": {
       // Native SVDs are marked with * — the same convention the vendor tools use.
+      // The group row's own value ("N SVD(s)") is already the count control
+      // (a +/- stepper in the UI, via describeCount) — a separate ".svd.count"
+      // row used to sit right under it showing the same number without a
+      // stepper, which read as two different controls for one concept.
       const scope = add.scope(p + ".vdb", GROUP.cta, "Video Data Block",
         block.svds.length + " SVD(s)", "string", region?.whole ?? null, "group");
       const payload = region?.payload ?? null;
       const rel = payload && region ? payload.offset - region.whole.offset : 0;
+      // The code is shown alongside its meaning here so it can be matched
+      // against what to type into "SVD Codes (VIC)" below.
       scope.at(rel, block.svds.length, p + ".svd", GROUP.cta, "Short Video Descriptors",
-        block.svds.map((s) => describeVic(s.vic) + (s.native ? " *" : "")).join(" / "));
+        block.svds.map((s) => s.vic + " " + describeVic(s.vic) + (s.native ? " *" : "")).join(" / "));
       scope.at(rel, block.svds.length, p + ".svd.vics", GROUP.cta, "SVD Codes (VIC)",
         block.svds.map((s) => (s.native ? s.vic + "*" : String(s.vic))).join(", "));
-      scope(p + ".svd.count", GROUP.cta, "SVD Count", block.svds.length, "number");
       break;
     }
     case "audio": {
@@ -571,7 +599,8 @@ function flattenCtaBlock(
         sad.at(2, 1, p + ".sad" + i + ".byte3", GROUP.audio,
           "Byte 3 (format-dependent)", "0x" + s.byte3.toString(16).padStart(2, "0"), "hex");
       });
-      scope(p + ".sad.count", GROUP.audio, "Audio Descriptor Count", block.sads.length, "number");
+      // The group row's own value ("N SAD(s)") is already the count control —
+      // same reasoning as the Video Data Block above.
       break;
     }
     case "speaker-allocation": {
@@ -634,9 +663,31 @@ function flattenExtendedBlock(
       EOTF_FLAGS.forEach((label, bit) => {
         add.at(2, 1, key + ".eotf" + bit, GROUP.hdr, "EOTF: " + label, ((eotf >> bit) & 1) === 1, "boolean");
       });
-      if (payload.length > 2) add.at(4, 1, key + ".maxLum", GROUP.hdr, "Max Luminance (code)", payload[2]!, "number");
-      if (payload.length > 3) add.at(5, 1, key + ".avgLum", GROUP.hdr, "Max Frame-Avg Luminance (code)", payload[3]!, "number");
-      if (payload.length > 4) add.at(6, 1, key + ".minLum", GROUP.hdr, "Min Luminance (code)", payload[4]!, "number");
+      // Two paths to the same byte: the raw code (kept for people who already
+      // think in codes) and the decoded cd/m² value (round2), which writes
+      // through to the same code via the documented inverse formula. Neither
+      // is a display-only mirror — both are independently editable.
+      if (payload.length > 2) {
+        const maxCode = payload[2]!;
+        add.at(4, 1, key + ".maxLumCode", GROUP.hdr, "Max Luminance (code)", maxCode, "number");
+        add.at(4, 1, key + ".maxLum", GROUP.hdr, "Max Luminance (cd/m²)",
+          round2(hdrMaxAvgLuminanceCdm2(maxCode)), "number");
+      }
+      if (payload.length > 3) {
+        const avgCode = payload[3]!;
+        add.at(5, 1, key + ".avgLumCode", GROUP.hdr, "Max Frame-Avg Luminance (code)", avgCode, "number");
+        add.at(5, 1, key + ".avgLum", GROUP.hdr, "Max Frame-Avg Luminance (cd/m²)",
+          round2(hdrMaxAvgLuminanceCdm2(avgCode)), "number");
+      }
+      if (payload.length > 4) {
+        const minCode = payload[4]!;
+        // Min luminance needs the max code to mean anything; a payload long
+        // enough to carry Min always carries Max too (Max is byte 2, Min byte 4).
+        const maxCode = payload[2]!;
+        add.at(6, 1, key + ".minLumCode", GROUP.hdr, "Min Luminance (code)", minCode, "number");
+        add.at(6, 1, key + ".minLum", GROUP.hdr, "Min Luminance (cd/m²)",
+          round2(hdrMinLuminanceCdm2(minCode, maxCode)), "number");
+      }
       break;
     }
     case CtaExtendedTag.HdrDynamicMetadata:
@@ -903,9 +954,14 @@ function flattenDisplayId(
   add.at(1, 1, p + ".version", GROUP.displayid, "DisplayID Version", version);
   add.at(1, 1, p + ".versionMajor", GROUP.displayid, "DisplayID Version (major)", ext.version, "number");
   add.at(1, 1, p + ".versionMinor", GROUP.displayid, "DisplayID Revision (minor)", ext.revision, "number");
-  // Byte 3 is "product type" in DisplayID 1.x and "primary use case" in 2.0.
+  // Byte 3 is "product type" in DisplayID 1.x and "primary use case" in 2.0 —
+  // same offset, different enumeration (both 16 codes; PRIMARY_USE_CASE_LABEL
+  // vs PRODUCT_TYPE_LABEL). The code stays the value; the label just names it.
+  const useCaseLabels = ext.version >= 2 ? PRIMARY_USE_CASE_LABEL : PRODUCT_TYPE_LABEL;
   add.at(3, 1, p + ".useCase", GROUP.displayid,
-    ext.version >= 2 ? "Primary Use Case" : "Product Type", ext.productType, "number");
+    (ext.version >= 2 ? "Primary Use Case" : "Product Type")
+      + " (" + (useCaseLabels[ext.productType & 0x0f] ?? "?") + ")",
+    ext.productType, "enum");
   add(p + ".blockCount", GROUP.displayid, "Data Block Count", ext.dataBlocks.length, "number");
 
   const did = layout.blocks[index + 1]?.displayid ?? null;

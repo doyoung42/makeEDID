@@ -14,7 +14,7 @@ test("edits round-trip through flatten -> apply -> flatten", { skip }, () => {
   const edid = load("DB8_H1_DTDs2");
   const cases = [
     ["base.manufacturer", "SAM", "SAM"],
-    ["base.productCode", 4660, 4660],
+    ["base.productCode", 4660, "0x1234"],
     ["base.sizeH", 80, 80],
     ["base.srgb", true, true],
     ["base.desc2.name", "MY MONITOR", "MY MONITOR"],

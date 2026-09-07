@@ -7,6 +7,7 @@ import {
   dolbyVisionFields, setDolbyVisionField,
 } from "./vsdb/index.js";
 import { encodeManufacturerId } from "./base.js";
+import { hdrMaxAvgLuminanceCode, hdrMinLuminanceCode } from "./hdr.js";
 import {
   DidTag, parseDisplayParamsV2, buildDisplayParamsV2,
   parseAdaptiveSync, buildAdaptiveSync, floatToHalf,
@@ -67,7 +68,7 @@ export function isFieldEditable(path: string): boolean {
   if (EDITABLE_BASE_EXTRA.has(path)) return true;
   if (path === "base.edidVersionMajor" || path === "base.edidRevision") return true;
   if (/^base\.desc\d+\.(vMin|vMax|hMin|hMax|maxClock|timingSupport)$/.test(path)) return true;
-  if (/^base\.chroma\.(red|green|blue|white)[XY]$/.test(path)) return true;
+  if (/^base\.chroma\.(red|green|blue|white)[XY](Code)?$/.test(path)) return true;
 
   const cta = /^cta\d+\.(.+)$/.exec(path);
   if (cta) {
@@ -309,7 +310,6 @@ const DTD_FIELD: Record<string, { min: number; max: number; label: string }> = {
   vBorder:      { min: 0, max: 255, label: "V Border" },
   stereo:       { min: 0, max: 7, label: "Stereo Mode" },
   syncType:     { min: 0, max: 3, label: "Sync Type" },
-  syncFlags:    { min: 0, max: 3, label: "Sync Flags" },
 };
 
 /** A field name accepted by either the Type VII or the Type X writer. */
@@ -390,11 +390,23 @@ function applyDynamicRangeLimits(
 }
 
 export function isDtdField(field: string): boolean {
-  return field === "interlaced" || Object.hasOwn(DTD_FIELD, field);
+  return field === "interlaced" || field === "hSyncPositive" || field === "vSyncPositive"
+    || Object.hasOwn(DTD_FIELD, field);
 }
 
 function applyDtdField(d: DetailedTimingDescriptor, field: string, value: string | number | boolean): boolean {
   if (field === "interlaced") { d.interlaced = toBool(value); return true; }
+  // Byte 17 bits 2:1, exposed as booleans (see flatten.ts for why — the
+  // meaning is polarity only under "Digital separate" sync, but the bits
+  // themselves are always safe to write regardless of sync type).
+  if (field === "hSyncPositive") {
+    d.syncFlags = toBool(value) ? d.syncFlags | 1 : d.syncFlags & ~1 & 0x03;
+    return true;
+  }
+  if (field === "vSyncPositive") {
+    d.syncFlags = toBool(value) ? d.syncFlags | 2 : d.syncFlags & ~2 & 0x03;
+    return true;
+  }
 
   const spec = DTD_FIELD[field];
   if (!spec) return false;
@@ -461,10 +473,21 @@ function applyDescriptorField(edid: Edid, path: string, value: string | number |
     return applyRangeLimitField(slot, range[2]!, value);
   }
 
+  // Two writers per coordinate, both landing on the same byte: the raw 10-bit
+  // code (`...Code`) and the decoded CIE value, which round-trips through the
+  // same code via `code = round(value * 1024)`.
+  const chromaCode = /^base\.chroma\.(redX|redY|greenX|greenY|blueX|blueY|whiteX|whiteY)Code$/.exec(path);
+  if (chromaCode) {
+    edid.base.chromaticity[chromaCode[1]! as keyof typeof edid.base.chromaticity] =
+      clampInt(value, 0, 1023, "Chromaticity coordinate");
+    return true;
+  }
+
   const chroma = /^base\.chroma\.(redX|redY|greenX|greenY|blueX|blueY|whiteX|whiteY)$/.exec(path);
   if (chroma) {
+    const cie = clampFloat(value, 0, 0.999, "Chromaticity coordinate (CIE)");
     edid.base.chromaticity[chroma[1]! as keyof typeof edid.base.chromaticity] =
-      clampInt(value, 0, 1023, "Chromaticity coordinate");
+      Math.min(1023, Math.max(0, Math.round(cie * 1024)));
     return true;
   }
 
@@ -655,7 +678,7 @@ function applySadField(ext: CtaExtension, sadIndex: number, field: string, value
 const EXT_TAG_FIELD = /^ext(\d+)\.(.+)$/;
 
 const EDITABLE_EXT_FIELD =
-  /^ext(5\.(xvycc601|xvycc709|sycc601|opycc601|oprgb|bt2020cycc|bt2020ycc|bt2020rgb|ictcp|dcip3)|6\.(eotf[0-3]|maxLum|avgLum|minLum)|0\.(qy|qs|spt|sit|sce))$/;
+  /^ext(5\.(xvycc601|xvycc709|sycc601|opycc601|oprgb|bt2020cycc|bt2020ycc|bt2020rgb|ictcp|dcip3)|6\.(eotf[0-3]|maxLum|maxLumCode|avgLum|avgLumCode|minLum|minLumCode)|0\.(qy|qs|spt|sit|sce))$/;
 
 /** Mirrors flatten.ts's COLORIMETRY_FLAGS: [byteOffset, bit, path suffix]. */
 const COLORIMETRY_BITS: Record<string, [number, number]> = {
@@ -696,9 +719,32 @@ function applyExtendedField(ext: CtaExtension, tag: number, field: string, value
   if (tag === 6) {   // HDR Static Metadata
     const eotfBit = /^eotf([0-3])$/.exec(field);
     if (eotfBit) { setBitIn(payload, 0, Number(eotfBit[1]), toBool(value)); return true; }
-    if (field === "maxLum" && payload.length > 2) { payload[2] = clampInt(value, 0, 255, "Max Luminance"); return true; }
-    if (field === "avgLum" && payload.length > 3) { payload[3] = clampInt(value, 0, 255, "Max Frame-Avg Luminance"); return true; }
-    if (field === "minLum" && payload.length > 4) { payload[4] = clampInt(value, 0, 255, "Min Luminance"); return true; }
+    // Two writers per luminance: the raw code, and the decoded cd/m² value
+    // (which round-trips through the same byte via the documented formula's
+    // algebraic inverse — see hdr.ts).
+    if (field === "maxLumCode" && payload.length > 2) {
+      payload[2] = clampInt(value, 0, 255, "Max Luminance"); return true;
+    }
+    if (field === "maxLum" && payload.length > 2) {
+      payload[2] = hdrMaxAvgLuminanceCode(clampFloat(value, 0.001, 1e9, "Max Luminance (cd/m²)"));
+      return true;
+    }
+    if (field === "avgLumCode" && payload.length > 3) {
+      payload[3] = clampInt(value, 0, 255, "Max Frame-Avg Luminance"); return true;
+    }
+    if (field === "avgLum" && payload.length > 3) {
+      payload[3] = hdrMaxAvgLuminanceCode(clampFloat(value, 0.001, 1e9, "Max Frame-Avg Luminance (cd/m²)"));
+      return true;
+    }
+    if (field === "minLumCode" && payload.length > 4) {
+      payload[4] = clampInt(value, 0, 255, "Min Luminance"); return true;
+    }
+    if (field === "minLum" && payload.length > 4) {
+      // Needs the sibling max code, which the same payload always carries
+      // (Min at byte 4 implies Max at byte 2 is present).
+      payload[4] = hdrMinLuminanceCode(clampFloat(value, 0, 1e9, "Min Luminance (cd/m²)"), payload[2] ?? 0);
+      return true;
+    }
     return false;
   }
 

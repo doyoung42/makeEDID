@@ -473,7 +473,8 @@ export type StructureTarget =
   | { kind: "extension"; extIndex: number; label: string }
   | { kind: "cta-block"; extIndex: number; blockIndex: number; label: string }
   | { kind: "did-block"; extIndex: number; blockIndex: number; label: string }
-  | { kind: "descriptor"; slot: number; label: string };
+  | { kind: "descriptor"; slot: number; label: string }
+  | { kind: "standard-timing"; slot: number; label: string };
 
 /**
  * Resolve a flatten row path to the block it stands for.
@@ -497,6 +498,14 @@ export function structureTargetFor(edid: Edid, path: string): StructureTarget | 
   if (desc) {
     const slot = Number(desc[1]);
     return slot < 4 ? { kind: "descriptor", slot, label: `Descriptor ${slot + 1}` } : null;
+  }
+
+  const std = /^base\.std(\d+)$/.exec(path);
+  if (std) {
+    const slot = Number(std[1]);
+    return slot < edid.base.standardTimings.length
+      ? { kind: "standard-timing", slot, label: `Standard Timing ${slot + 1}` }
+      : null;
   }
 
   const did = /^did(\d+)\.db(\d+)$/.exec(path);
@@ -571,7 +580,75 @@ export function removeAtPath(edid: Edid, path: string): boolean {
     case "cta-block": return removeCtaBlock(edid, target.extIndex, target.blockIndex);
     case "did-block": return removeDisplayIdBlock(edid, target.extIndex, target.blockIndex);
     case "descriptor": return setDescriptorKind(edid, target.slot, "unknown");
+    // A standard timing slot is "removed" by unchecking its own `used` field
+    // (applyField), not through this structural path — there's no block to
+    // detach, just a byte pair to zero. Not offered as a remove button.
+    case "standard-timing": return false;
   }
+}
+
+/**
+ * Swap a structural row with its neighbour — the only kind of "reordering"
+ * that makes sense here, since every addressable kind lives in a fixed-size
+ * or byte-identical-cost slot in some array. Moving item N to a distant
+ * position is just repeated adjacent swaps, so one primitive covers both
+ * "nudge up/down" (the UI's ▲/▼) and, if ever needed, a longer move.
+ */
+export function moveAtPath(edid: Edid, path: string, direction: "up" | "down"): boolean {
+  const target = structureTargetFor(edid, path);
+  if (!target) return false;
+  const move = moveOf(edid, target);
+  if (!move) return false;
+  const j = move.index + (direction === "up" ? -1 : 1);
+  if (j < 0 || j >= move.length) return false;
+  return guarded(edid, `Move ${target.kind.replace("-", " ")}`,
+    () => swap(move.list, move.index, j), () => swap(move.list, move.index, j));
+}
+
+/**
+ * Whether a move is even possible, without performing it — the UI calls this
+ * on every row on every render to decide whether to show ▲/▼, so it has to be
+ * a plain bounds check, not "swap on a clone and see what happens".
+ */
+export function canMoveAtPath(edid: Edid, path: string, direction: "up" | "down"): boolean {
+  const target = structureTargetFor(edid, path);
+  if (!target) return false;
+  const move = moveOf(edid, target);
+  if (!move) return false;
+  const j = move.index + (direction === "up" ? -1 : 1);
+  return j >= 0 && j < move.length;
+}
+
+/** Resolve a target to the array it lives in and its index within it. */
+function moveOf(edid: Edid, target: StructureTarget): { list: unknown[]; index: number; length: number } | null {
+  switch (target.kind) {
+    case "extension":
+      return { list: edid.extensions, index: target.extIndex, length: edid.extensions.length };
+    case "cta-block": {
+      const ext = edid.extensions[target.extIndex];
+      if (!ext || ext.kind !== "cta") return null;
+      return { list: ext.dataBlocks, index: target.blockIndex, length: ext.dataBlocks.length };
+    }
+    case "did-block": {
+      const ext = edid.extensions[target.extIndex];
+      if (!ext || ext.kind !== "displayid") return null;
+      return { list: ext.dataBlocks, index: target.blockIndex, length: ext.dataBlocks.length };
+    }
+    case "descriptor":
+      return { list: edid.base.descriptors, index: target.slot, length: edid.base.descriptors.length };
+    case "standard-timing":
+      return {
+        list: edid.base.standardTimings, index: target.slot,
+        length: edid.base.standardTimings.length,
+      };
+  }
+}
+
+/** In-place swap. Its own inverse, so it doubles as its own undo. */
+function swap<T>(list: T[], i: number, j: number): void {
+  const t = list[i]!;
+  list[i] = list[j]!;
+  list[j] = t;
 }
 
 /**

@@ -1,16 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   decodeEdid, encodeEdid, flattenEdid, applyField, isFieldEditable,
-  bytesToHex, hexToBytes, describeCount,
-  addExtension, addCtaBlock, addDisplayIdBlock, removeAtPath, setListCount,
+  bytesToHex, hexToBytes, describeCount, formatEdidReport,
+  addExtension, addCtaBlock, addDisplayIdBlock, removeAtPath, setListCount, moveAtPath, canMoveAtPath,
   structureTargetFor, addTargetFor, ctaBlockCatalogue, displayIdBlockCatalogue,
   type Edid, type SpecField,
 } from "@edid/core";
+import { serialiseEdidXml } from "@edid/io";
 import { api, fileToBase64, type DirNode, type FileEntry } from "./api.js";
 import { FileTree } from "./FileTree.js";
 import { MatrixView } from "./MatrixView.js";
 import { HexPanel } from "./HexPanel.js";
 import { PromptDialog, ConfirmDialog, PickerDialog } from "./PromptDialog.js";
+import { downloadText, withExtension } from "./download.js";
 
 /** One model in the matrix: a file on disk plus its live, edited state. */
 export interface Column {
@@ -29,6 +31,7 @@ type DialogState =
   | { kind: "close-dirty"; index: number }
   | { kind: "add-extension"; column: number }
   | { kind: "add-block"; column: number; extIndex: number; catalogue: "cta" | "displayid" }
+  | { kind: "export"; column: number }
   | null;
 
 export function App() {
@@ -41,6 +44,7 @@ export function App() {
   const [clipboard, setClipboard] = useState<SpecField[] | null>(null);
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [dialog, setDialog] = useState<DialogState>(null);
+  const [sidebarWidth, setSidebarWidth] = useState(280);
   const [flashBytes, setFlashBytes] = useState<Set<number>>(new Set());
   const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const importInput = useRef<HTMLInputElement | null>(null);
@@ -213,10 +217,37 @@ export function App() {
       setDialog({ kind: "add-block", column: col, extIndex: target.extIndex, catalogue: target.kind });
     },
     onRemove: (col: number, path: string) => mutateStructure(col, (edid) => removeAtPath(edid, path)),
+    canMove: (col: number, path: string, direction: "up" | "down") => {
+      const edid = columns[col]?.edid;
+      return edid ? canMoveAtPath(edid, path, direction) : false;
+    },
+    onMove: (col: number, path: string, direction: "up" | "down") =>
+      mutateStructure(col, (edid) => moveAtPath(edid, path, direction)),
     onSetCount: (col: number, path: string, n: number) =>
       mutateStructure(col, (edid) => setListCount(edid, path, n)),
     onAddExtension: (col: number) => setDialog({ kind: "add-extension", column: col }),
   }), [columns, mutateStructure]);
+
+  // ------------------------------------------------------------- export
+
+  const exportColumn = (index: number, format: "ddc" | "xml" | "txt") => {
+    const col = columns[index];
+    if (!col) return;
+    let bytes: Uint8Array;
+    try {
+      bytes = encodeEdid(col.edid);
+    } catch (e) {
+      setError(`Cannot export ${col.name}: ${e instanceof Error ? e.message : String(e)}`);
+      return;
+    }
+    if (format === "ddc") {
+      downloadText(withExtension(col.name, "ddc"), bytesToHex(bytes));
+    } else if (format === "xml") {
+      downloadText(withExtension(col.name, "xml"), serialiseEdidXml(bytes), "application/xml");
+    } else {
+      downloadText(withExtension(col.name, "txt"), formatEdidReport(col.edid, col.name));
+    }
+  };
 
   /** Copy every writable field out of one column. */
   const copyColumn = (index: number) => {
@@ -396,7 +427,7 @@ export function App() {
       {error && <div className="banner" onClick={() => setError(null)}>{error}</div>}
 
       <div className="body">
-        <aside className="sidebar">
+        <aside className="sidebar" style={{ width: sidebarWidth }}>
           <div className="sidebar-head">
             <h2>Files</h2>
             <button title="New .ddc in the project root" onClick={() => setDialog({ kind: "new-file", dir: "" })}>New</button>
@@ -424,6 +455,24 @@ export function App() {
             }}
           />
         </aside>
+        <span
+          className="sidebar-resize"
+          title="Drag to resize"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            const startWidth = sidebarWidth;
+            const startX = e.clientX;
+            const onMouseMove = (ev: MouseEvent) => {
+              setSidebarWidth(Math.max(160, startWidth + (ev.clientX - startX)));
+            };
+            const onMouseUp = () => {
+              window.removeEventListener("mousemove", onMouseMove);
+              window.removeEventListener("mouseup", onMouseUp);
+            };
+            window.addEventListener("mousemove", onMouseMove);
+            window.addEventListener("mouseup", onMouseUp);
+          }}
+        />
 
         <main className="main">
           {columns.length === 0 ? (
@@ -455,6 +504,7 @@ export function App() {
                 onClose={closeColumn}
                 hasClipboard={clipboard !== null}
                 structure={structure}
+                onExport={(i) => setDialog({ kind: "export", column: i })}
               />
               {focusedColumn && focusedBytes && (
                 <HexPanel
@@ -541,6 +591,22 @@ export function App() {
             mutateStructure(column, (edid) => catalogue === "cta"
               ? addCtaBlock(edid, extIndex, id)
               : addDisplayIdBlock(edid, extIndex, Number(id)));
+          }}
+        />
+      )}
+      {dialog?.kind === "export" && (
+        <PickerDialog
+          title={`Export ${columns[dialog.column]?.name ?? "model"} as…`}
+          options={[
+            { id: "ddc", label: ".ddc — the working hex format", group: "Export" },
+            { id: "xml", label: ".xml — DATAOBJ (ATP Manager)", group: "Export" },
+            { id: "txt", label: ".txt — plain-text decode report", group: "Export" },
+          ]}
+          onCancel={() => setDialog(null)}
+          onConfirm={(id) => {
+            const col = dialog.column;
+            setDialog(null);
+            exportColumn(col, id as "ddc" | "xml" | "txt");
           }}
         />
       )}

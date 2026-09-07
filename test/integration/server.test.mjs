@@ -182,7 +182,7 @@ test("I4: an edit persists and touches only the bytes it should", async () => {
   const back = hexToBytes(reloaded.body.hex);
 
   const value = flattenEdid(decodeEdid(back)).find((f) => f.path === "base.productCode")?.value;
-  assert.equal(value, 0x4d2, "edited value did not survive the round trip");
+  assert.equal(value, "0x04D2", "edited value did not survive the round trip");
 
   // productCode is bytes 10-11; the checksum at 127 necessarily moves with it.
   const changed = [];

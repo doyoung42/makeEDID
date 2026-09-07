@@ -5,6 +5,87 @@
 
 ---
 
+## v0.6.0 — 2026-09-07
+
+첫 공개 커밋 이후 실사용 피드백 14건 — UX 4건, spec 필드 9건, 그리고 그 과정에서
+드러난 실제 버그 1건(수정된 줄 알았는데 안 된 정규식).
+
+### UX
+
+- **열 폭 수동 조절.** 균등분배가 기본이고(요청대로 유지), 처음 드래그하는 순간
+  그때의 렌더 폭을 전부 얼려서 수동 모드로 전환한다 — 지난 라운드에 "Fit/Manual"을
+  없앴던 이유(`width: 100%`와 명시적 `<col>` 폭이 항상 충돌)를 이번엔 회피했다:
+  수동 폭이 하나라도 있을 때만 `width: 100%`를 뗀다. **모델 열, 좌측 spec-field 열,
+  파일 트리 사이드바** 셋 다 같은 방식으로 리사이즈된다. "Reset widths"로 균등분배
+  복귀.
+- **내보내기 — `.ddc` / `.xml` / `.txt`.** xml은 기존 `serialiseEdidXml`(DATAOBJ,
+  이미 라운드트립 검증됨)을 그대로 재사용. txt는 새 `packages/edid-core/src/report.ts`
+  가 `flattenEdid`를 그대로 걸어서 만든다 — 매트릭스가 보여주는 것과 항상 일치한다.
+  전부 클라이언트에서 즉시 blob 다운로드(일반 브라우저 탭이라 문제없음).
+
+### Spec 필드 9건
+
+- **Product Code를 HEX로.** `Number("0x7042")`가 JS에서 이미 hex를 네이티브로
+  파싱하므로 writer는 안 고쳐도 됐다 — 표시(`"0x7042"`)와 입력 컨트롤만 바꿨다.
+- **색좌표 — 코드 대신 디코드값으로 입력.** 기존 8개 경로(`redX`...)를 AMD FreeSync가
+  이미 쓰던 명명 관례(`...Code` 접미사)로 개명해 원시 코드 입력을 유지하고, 같은
+  이름으로 디코드값(CIE 0.0000-0.9990) 편집 경로를 새로 냈다. `code = round(value*1024)`
+  로 역산해 **같은 바이트**에 쓴다 — 어느 경로로 입력해도 결과가 같다.
+- **HDR Static Metadata 휘도 — 코드 → cd/m² 환산.** 공식을 디컴파일 소스
+  (`HdrStaticMetadataBlock.java`, 가장 강한 근거 등급)에서 확인했다:
+  `Max/Avg = 50 × 2^(CV/32)`, `Min = Max × (CV/255)² / 100`. 색좌표와 같은 패턴으로
+  코드/디코드 양쪽 다 편집 가능하다. 역함수(로그·제곱근)는 새 모듈
+  `packages/edid-core/src/hdr.ts`에 결정형 함수로 뒀다.
+- **Standard Timing 순서 변경 + 블록 순서 이동.** 하나의 메커니즘으로 풀었다 —
+  `structure.ts`에 `moveAtPath(edid, path, "up"|"down")`를 추가해 확장·CTA/DisplayID
+  데이터블록·디스크립터·standard timing 전부 "인접 인덱스와 자리를 맞바꾼다"로
+  통일했다. 추가/삭제와 달리 스왑은 바이트 개수가 절대 안 바뀐다(TC가 이걸 단언).
+  UI는 `structureTargetFor`가 이미 종류를 판별해주므로 행마다 종류별 분기 없이
+  ▲/▼ 버튼 하나로 전부 처리된다.
+- **Video/Audio Data Block 중복 카운트 칸 제거.** "숫자 칸이 2개인데 차이를 모르겠다"의
+  정체는 그룹 행 자체의 개수 스테퍼(`describeCount`)와 그 아래 읽기전용
+  `svd.count`/`sad.count` 행이 같은 숫자를 다르게 보여주던 것이었다. 후자를 삭제해
+  조작 가능한 스테퍼 하나만 남겼다. SVD 목록도 코드 옆에 의미를 같이 낸다
+  (`16 1920x1080p @ 60Hz 16:9 *`).
+- **DTD Sync Flags → H/V Sync Positive 체크박스.** 바이트 17 bit1/bit2는 Sync Type이
+  "Digital separate"일 때 정확히 V/H sync polarity다 — 원시 2비트 숫자 대신 체크박스
+  두 개로 노출했다. 다른 sync type에서는 라벨이 "raw — meaning depends on Sync Type"
+  으로 오해를 막는다.
+- **DisplayID Product Type / Primary Use Case에 의미 표기.** 디컴파일 소스
+  (`PrimaryUseCase.java`/`ProductTypeId.java`, 16/16 코드 전부 라벨 있음)에서 가져와
+  버전에 따라 맞는 라벨을 행 이름에 붙인다(`ext.version >= 2`로 이미 갈라 쓰던
+  조건 그대로).
+
+### 잡은 버그 — 고쳤다고 생각했는데 안 고쳐져 있었다
+
+`EDITABLE_EXT_FIELD` 정규식에 새 `...Code` 필드 3개를 추가하는 스크립트를 돌렸다고
+기록까지 했는데, 실제 파일엔 옛 버전이 그대로 남아 있었다(`npm run audit`이
+"읽기 전용인데 사유가 없다"로 정확히 잡아냈다). **"고쳤다"와 "고쳐졌다"는 다른
+사실이다** — 이번엔 다시 열어서 확인했다. `packages/edid-core/CLAUDE.md`에 기록.
+
+같은 라운드에 뮤테이션 프로브·필드 감사 스크립트의 `perturb()`도 두 군데 고쳤다:
+디코드값이 문자열로 나오는 필드(색좌표·HDR 휘도)가 `typeof value` 기준 분기에서
+빠져 있었고, 범위가 좁은 숫자 필드(예: 색좌표 0-0.999)에 대한 블라인드 `-1` 스텝이
+범위를 벗어나 항상 거부되고 있었다. 둘 다 "실패"가 아니라 "커버리지 0"으로
+조용히 숨어 있던 문제라 더 놓치기 쉬웠다.
+
+### 검증
+
+```bash
+npm run build && npm run test:all      # 114/114 (v0.5.0의 98에서)
+npm run audit                          # 356 필드 / 316 편집가능 / 310 검증됨, 사유 없는 읽기전용 0
+EDID_CORPUS_ROOT=<코퍼스> node --test test/corpus/span.test.mjs   # 1,436 edits / 364 shapes, 위반 0
+```
+
+브라우저에서 양산 파일 복제본으로 직접 확인: HDR10+/HDR Static Metadata 순서 교체
+(13바이트 변경, 체크섬 유효) → 저장 → 재로드해도 순서 유지, 색좌표 `0.6400` 입력 →
+코드 655로 자동 변환 → 재표시 `0.6396`(가장 가까운 표현 가능값), HDR Max Luminance에
+`1000` cd/m² 입력 → 코드 138 → 재표시 `993.49`(8비트 코드의 정밀도 한계, 정상),
+H/V Sync Positive 체크박스 실측 데이터에서 정상 토글. 복제본은 확인 후 삭제, 원본
+md5 불변.
+
+---
+
 ## v0.5.0 — 2026-09-04
 
 **웹에서 "고쳐지지 않는다"의 원인을 셋 다 걷어냈다.** 코덱은 이미 1,397개를 100%

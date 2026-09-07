@@ -154,6 +154,48 @@
       "editable": false
     },
     {
+      "path": "base.chroma.blueX",
+      "group": "Base EDID",
+      "label": "blueX (CIE)",
+      "kind": "number",
+      "specDoc": "e_edid_base",
+      "section": "Chromaticity coordinates",
+      "sourceKind": "port",
+      "editable": true,
+      "note": "Decoded editable path: code = round(value * 1024), writes the same byte as ...Code."
+    },
+    {
+      "path": "base.chroma.blueXCode",
+      "group": "Base EDID",
+      "label": "blueX (10-bit code)",
+      "kind": "number",
+      "specDoc": "e_edid_base",
+      "section": "Chromaticity coordinates",
+      "sourceKind": "port",
+      "editable": true
+    },
+    {
+      "path": "base.chroma.blueY",
+      "group": "Base EDID",
+      "label": "blueY (CIE)",
+      "kind": "number",
+      "specDoc": "e_edid_base",
+      "section": "Chromaticity coordinates",
+      "sourceKind": "port",
+      "editable": true,
+      "note": "Decoded editable path: code = round(value * 1024), writes the same byte as ...Code."
+    },
+    {
+      "path": "base.chroma.blueYCode",
+      "group": "Base EDID",
+      "label": "blueY (10-bit code)",
+      "kind": "number",
+      "specDoc": "e_edid_base",
+      "section": "Chromaticity coordinates",
+      "sourceKind": "port",
+      "editable": true
+    },
+    {
       "path": "base.chroma.green",
       "group": "Base EDID",
       "label": "Green (x, y)",
@@ -162,6 +204,48 @@
       "section": "Base EDID block",
       "sourceKind": "decompiled",
       "editable": false
+    },
+    {
+      "path": "base.chroma.greenX",
+      "group": "Base EDID",
+      "label": "greenX (CIE)",
+      "kind": "number",
+      "specDoc": "e_edid_base",
+      "section": "Chromaticity coordinates",
+      "sourceKind": "port",
+      "editable": true,
+      "note": "Decoded editable path: code = round(value * 1024), writes the same byte as ...Code."
+    },
+    {
+      "path": "base.chroma.greenXCode",
+      "group": "Base EDID",
+      "label": "greenX (10-bit code)",
+      "kind": "number",
+      "specDoc": "e_edid_base",
+      "section": "Chromaticity coordinates",
+      "sourceKind": "port",
+      "editable": true
+    },
+    {
+      "path": "base.chroma.greenY",
+      "group": "Base EDID",
+      "label": "greenY (CIE)",
+      "kind": "number",
+      "specDoc": "e_edid_base",
+      "section": "Chromaticity coordinates",
+      "sourceKind": "port",
+      "editable": true,
+      "note": "Decoded editable path: code = round(value * 1024), writes the same byte as ...Code."
+    },
+    {
+      "path": "base.chroma.greenYCode",
+      "group": "Base EDID",
+      "label": "greenY (10-bit code)",
+      "kind": "number",
+      "specDoc": "e_edid_base",
+      "section": "Chromaticity coordinates",
+      "sourceKind": "port",
+      "editable": true
     },
     {
       "path": "base.chroma.red",
@@ -174,6 +258,48 @@
       "editable": false
     },
     {
+      "path": "base.chroma.redX",
+      "group": "Base EDID",
+      "label": "redX (CIE)",
+      "kind": "number",
+      "specDoc": "e_edid_base",
+      "section": "Chromaticity coordinates",
+      "sourceKind": "port",
+      "editable": true,
+      "note": "Decoded editable path: code = round(value * 1024), writes the same byte as ...Code."
+    },
+    {
+      "path": "base.chroma.redXCode",
+      "group": "Base EDID",
+      "label": "redX (10-bit code)",
+      "kind": "number",
+      "specDoc": "e_edid_base",
+      "section": "Chromaticity coordinates",
+      "sourceKind": "port",
+      "editable": true
+    },
+    {
+      "path": "base.chroma.redY",
+      "group": "Base EDID",
+      "label": "redY (CIE)",
+      "kind": "number",
+      "specDoc": "e_edid_base",
+      "section": "Chromaticity coordinates",
+      "sourceKind": "port",
+      "editable": true,
+      "note": "Decoded editable path: code = round(value * 1024), writes the same byte as ...Code."
+    },
+    {
+      "path": "base.chroma.redYCode",
+      "group": "Base EDID",
+      "label": "redY (10-bit code)",
+      "kind": "number",
+      "specDoc": "e_edid_base",
+      "section": "Chromaticity coordinates",
+      "sourceKind": "port",
+      "editable": true
+    },
+    {
       "path": "base.chroma.white",
       "group": "Base EDID",
       "label": "White (x, y)",
@@ -182,6 +308,48 @@
       "section": "Base EDID block",
       "sourceKind": "decompiled",
       "editable": false
+    },
+    {
+      "path": "base.chroma.whiteX",
+      "group": "Base EDID",
+      "label": "whiteX (CIE)",
+      "kind": "number",
+      "specDoc": "e_edid_base",
+      "section": "Chromaticity coordinates",
+      "sourceKind": "port",
+      "editable": true,
+      "note": "Decoded editable path: code = round(value * 1024), writes the same byte as ...Code."
+    },
+    {
+      "path": "base.chroma.whiteXCode",
+      "group": "Base EDID",
+      "label": "whiteX (10-bit code)",
+      "kind": "number",
+      "specDoc": "e_edid_base",
+      "section": "Chromaticity coordinates",
+      "sourceKind": "port",
+      "editable": true
+    },
+    {
+      "path": "base.chroma.whiteY",
+      "group": "Base EDID",
+      "label": "whiteY (CIE)",
+      "kind": "number",
+      "specDoc": "e_edid_base",
+      "section": "Chromaticity coordinates",
+      "sourceKind": "port",
+      "editable": true,
+      "note": "Decoded editable path: code = round(value * 1024), writes the same byte as ...Code."
+    },
+    {
+      "path": "base.chroma.whiteYCode",
+      "group": "Base EDID",
+      "label": "whiteY (10-bit code)",
+      "kind": "number",
+      "specDoc": "e_edid_base",
+      "section": "Chromaticity coordinates",
+      "sourceKind": "port",
+      "editable": true
     },
     {
       "path": "base.continuousFreq",
@@ -904,6 +1072,17 @@
       "editable": false
     },
     {
+      "path": "did*.useCase",
+      "group": "DisplayID",
+      "label": "Product Type / Primary Use Case",
+      "kind": "enum",
+      "specDoc": "",
+      "section": "DisplayID base section byte 3",
+      "sourceKind": "decompiled",
+      "editable": true,
+      "note": "16/16 codes labelled from decompiled PrimaryUseCase.java (v2.0) / ProductTypeId.java (v1.x); no registered spec PDF enumerates them, only the 0x00-0x0F range."
+    },
+    {
       "path": "did*.version",
       "group": "DisplayID",
       "label": "DisplayID Version",
@@ -1280,12 +1459,33 @@
     {
       "path": "cta*.ext6.avgLum",
       "group": "HDR",
+      "label": "Max Frame-Avg Luminance (cd/m²)",
+      "kind": "number",
+      "specDoc": "",
+      "section": "HDR Static Metadata Data Block",
+      "sourceKind": "decompiled",
+      "editable": true,
+      "note": "No registered spec extract carries the luminance formula — offsets are listed but not the calculation. Source: reference/decompiled/.../hdr/HdrStaticMetadataBlock.java luminance(Lum), the strongest evidence tier this project uses."
+    },
+    {
+      "path": "cta*.ext6.avgLum",
+      "group": "HDR",
       "label": "Max Frame-Avg Luminance (code)",
       "kind": "number",
       "specDoc": "cta_861_h",
       "section": "CTA-861 extension and data blocks",
       "sourceKind": "decompiled",
       "editable": false
+    },
+    {
+      "path": "cta*.ext6.avgLumCode",
+      "group": "HDR",
+      "label": "Max Frame-Avg Luminance (code)",
+      "kind": "number",
+      "specDoc": "cta_861_h",
+      "section": "HDR Static Metadata Data Block",
+      "sourceKind": "decompiled",
+      "editable": true
     },
     {
       "path": "cta*.ext6.eotf",
@@ -1300,12 +1500,44 @@
     {
       "path": "cta*.ext6.maxLum",
       "group": "HDR",
+      "label": "Max Luminance (cd/m²)",
+      "kind": "number",
+      "specDoc": "",
+      "section": "HDR Static Metadata Data Block",
+      "sourceKind": "decompiled",
+      "editable": true,
+      "note": "No registered spec extract carries the luminance formula — offsets are listed but not the calculation. Source: reference/decompiled/.../hdr/HdrStaticMetadataBlock.java luminance(Lum), the strongest evidence tier this project uses."
+    },
+    {
+      "path": "cta*.ext6.maxLum",
+      "group": "HDR",
       "label": "Max Luminance (code)",
       "kind": "number",
       "specDoc": "cta_861_h",
       "section": "CTA-861 extension and data blocks",
       "sourceKind": "decompiled",
       "editable": false
+    },
+    {
+      "path": "cta*.ext6.maxLumCode",
+      "group": "HDR",
+      "label": "Max Luminance (code)",
+      "kind": "number",
+      "specDoc": "cta_861_h",
+      "section": "HDR Static Metadata Data Block",
+      "sourceKind": "decompiled",
+      "editable": true
+    },
+    {
+      "path": "cta*.ext6.minLum",
+      "group": "HDR",
+      "label": "Min Luminance (cd/m²)",
+      "kind": "number",
+      "specDoc": "",
+      "section": "HDR Static Metadata Data Block",
+      "sourceKind": "decompiled",
+      "editable": true,
+      "note": "No registered spec extract carries the luminance formula — offsets are listed but not the calculation. Source: reference/decompiled/.../hdr/HdrStaticMetadataBlock.java luminance(Lum), the strongest evidence tier this project uses."
     },
     {
       "path": "cta*.ext6.minLum",
@@ -1316,6 +1548,16 @@
       "section": "CTA-861 extension and data blocks",
       "sourceKind": "decompiled",
       "editable": false
+    },
+    {
+      "path": "cta*.ext6.minLumCode",
+      "group": "HDR",
+      "label": "Min Luminance (code)",
+      "kind": "number",
+      "specDoc": "cta_861_h",
+      "section": "HDR Static Metadata Data Block",
+      "sourceKind": "decompiled",
+      "editable": true
     },
     {
       "path": "cta*.vsdb.90-84-8B.appVersion",
@@ -1349,6 +1591,28 @@
       "sourceKind": "corpus",
       "editable": true,
       "note": "Bit layout derived from 297 corpus EDIDs cross-checked against their decoded reports; no spec PDF is registered for HDR10+."
+    },
+    {
+      "path": "base.desc*.dtd.hSyncPositive",
+      "group": "Timing",
+      "label": "H Sync Positive",
+      "kind": "boolean",
+      "specDoc": "e_edid_base",
+      "section": "Detailed Timing Descriptor",
+      "sourceKind": "port",
+      "editable": true,
+      "note": "Byte 17 bit 0. Exact meaning (H sync polarity) confirmed only for Sync Type = Digital separate."
+    },
+    {
+      "path": "base.desc*.dtd.vSyncPositive",
+      "group": "Timing",
+      "label": "V Sync Positive",
+      "kind": "boolean",
+      "specDoc": "e_edid_base",
+      "section": "Detailed Timing Descriptor",
+      "sourceKind": "port",
+      "editable": true,
+      "note": "Byte 17 bit 1. Exact meaning (V sync polarity) confirmed only for Sync Type = Digital separate."
     },
     {
       "path": "cta*.ext35_*.t8.codeSize",

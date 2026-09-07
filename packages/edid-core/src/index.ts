@@ -10,6 +10,8 @@ export * from "./flatten.js";
 export * from "./applyField.js";
 export * from "./structure.js";
 export * from "./inputs.js";
+export * from "./hdr.js";
+export * from "./report.js";
 export * from "./displayid2.js";
 export * from "./vic.js";
 export * from "./layout.js";

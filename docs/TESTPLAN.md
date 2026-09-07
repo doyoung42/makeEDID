@@ -209,13 +209,45 @@ npm run audit          # 코퍼스가 다른 곳에 있으면 EDID_CORPUS_ROOT=.
 
 ---
 
-## 종합 (v0.5.0 기준)
+## B13 — v0.6.0: 열 폭·내보내기·spec 필드 9종
+
+전부 `projects/production` **복제본**에서 확인(원본 md5 불변 확인 완료).
+
+1. **열 폭 수동 조절** — 모델 열 3개 이상 로드 → 균등분배 확인 → 모델 열 하나
+   드래그 → `Object.keys(colWidths).length>0`이 되며 `table.matrix`에서 `.fit`
+   클래스가 빠짐(수동 모드 전환) → `Reset widths` → 균등분배 복귀. 좌측
+   spec-field 열, 파일 트리 사이드바도 각각 자체 핸들로 동일하게 확인.
+2. **내보내기** — 열 머리 `Export` → `.ddc`/`.xml`/`.txt` 각각 다운로드,
+   콘솔 에러 없음 확인. `.xml`은 `parseEdidXml`로 되읽어 바이트 일치 확인(단위 TC).
+3. **Product Code hex** — 셀이 `0x____` 형식, hex 입력 반영 확인(단위 TC로 등가).
+4. **색좌표 디코드 입력** — `Red x (CIE)`에 `0.6400` 입력 → `Red x (10-bit code)`가
+   `655`로, 디코드 셀 재표시가 `0.6396`(가장 가까운 표현 가능값)으로 바뀜을
+   실측 확인.
+5. **HDR Static Metadata 휘도** — 실측 파일(HDR10+ 포함 CTA-861 블록)에서
+   `Max Luminance (cd/m²)`에 `1000` 입력 → 코드 `138` → 재표시 `993.49`(8비트
+   코드 정밀도 한계, 정상). 코드 필드 직접 입력도 확인.
+6. **블록/데이터블록 순서 이동** — 실측 파일에서 HDR10+ VSDB를 HDR Static
+   Metadata보다 앞으로 이동(▲) → 13바이트 변경, 체크섬 유효 → Save → 재로드해도
+   순서 유지 확인(서버 API로 재확인).
+7. **DTD Sync Positive 체크박스** — 실측 데이터에서 `hSyncPositive`/`vSyncPositive`
+   체크 상태가 실제 값과 일치함을 확인(base descriptor · CTA DTD · Type VII 셋 다).
+8. **DisplayID Product Type/Primary Use Case** — 실측 코퍼스 스캔으로 버전별
+   라벨이 올바르게 갈라지는지 확인(`Product Type (Standalone display device...)`,
+   `Primary Use Case (Desktop gaming display)`) — 이번 테스트 파일엔 DisplayID
+   확장이 없어 UI 클릭 확인은 다음 세션 권장.
+
+**검증**: 위 1·2·4·5·6·7은 브라우저에서 직접 조작 확인(스크린샷·JS 콘솔 조회).
+8은 코퍼스 스캔으로 등가 확인. `Reset widths` 포함 전부 정상 동작.
+
+---
+
+## 종합 (v0.6.0 기준)
 
 | 계층 | 결과 |
 |---|---|
-| 자동화 (`npm run test:all`) | 98/98 pass (코퍼스 1,397개 라운드트립 포함) |
-| 자동화 (`npm run test:corpus` 뮤테이션 프로브) | 1,381 edits / 351 shapes, 위반 0 |
-| 자동화 (`npm run audit`) | 345 필드 / 303 편집가능 / 297 검증됨, 사유 없는 읽기전용 0 |
-| 브라우저 실사용 (B1, B4~B6, B9, B12-b) | 직접 조작으로 확인 완료 |
-| 브라우저 실사용 (B2, B3, B7, B8, B10, B11) | 스크립트/통합 TC로 등가 검증, 브라우저 클릭 경로는 다음 세션 권장 |
+| 자동화 (`npm run test:all`) | 114/114 pass (코퍼스 1,397개 라운드트립 포함) |
+| 자동화 (`npm run test:corpus` 뮤테이션 프로브) | 1,436 edits / 364 shapes, 위반 0 |
+| 자동화 (`npm run audit`) | 356 필드 / 316 편집가능 / 310 검증됨, 사유 없는 읽기전용 0 |
+| 브라우저 실사용 (B1, B4~B6, B9, B12-b, B13 대부분) | 직접 조작으로 확인 완료 |
+| 브라우저 실사용 (B2, B3, B7, B10, B11) | 스크립트/통합 TC로 등가 검증, 브라우저 클릭 경로는 다음 세션 권장 |
 | Dolby Vision · Type VIII | 코퍼스 실측 0건 — 합성 픽스처 왕복(`test/decoders.test.mjs`)으로만 검증됨 |

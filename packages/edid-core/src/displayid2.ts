@@ -247,6 +247,34 @@ export const SCAN_ORIENTATION = [
 
 export const NATIVE_COLOR_DEPTH = ["undefined", "6 bpc", "8 bpc", "10 bpc", "12 bpc", "14 bpc", "16 bpc"] as const;
 
+/**
+ * DisplayID 2.0 base section byte 3, "Display Product Primary Use Case".
+ * Source: decompiled `PrimaryUseCase.java` (16/16 codes named — the strongest
+ * evidence tier this project uses; no registered spec PDF enumerates them,
+ * only the 0x00-0x0F range).
+ */
+export const PRIMARY_USE_CASE_LABEL = [
+  "Extension", "Test Structure", "Generic display", "Television (TV) display",
+  "Desktop productivity display", "Desktop gaming display", "Presentation display",
+  "Virtual Reality (VR) display", "Augmented Reality (AR) display",
+  "Reserved (9)", "Reserved (10)", "Reserved (11)", "Reserved (12)",
+  "Reserved (13)", "Reserved (14)", "Reserved (15)",
+] as const;
+
+/**
+ * DisplayID 1.x base section byte 3, "Product Type" — same byte offset, a
+ * different enumeration before version 2.0. Source: decompiled
+ * `ProductTypeId.java`.
+ */
+export const PRODUCT_TYPE_LABEL = [
+  "Extension", "Test Structure",
+  "Display panel or other transducer, LCD or PDP module, etc.",
+  "Standalone display device, desktop monitor, TV, etc.",
+  "Television Receiver", "Repeater/Translator", "Direct Drive Monitor",
+  "Reserved (7)", "Reserved (8)", "Reserved (9)", "Reserved (10)",
+  "Reserved (11)", "Reserved (12)", "Reserved (13)", "Reserved (14)", "Reserved (15)",
+] as const;
+
 export const DISPLAY_DEVICE_TECH = [
   "undefined", "LCD", "OLED", "Plasma (PDP)", "Electroluminescent",
   "Electrophoretic", "Projector", "reserved",

@@ -83,7 +83,6 @@ const RULES: [RegExp, FieldInput][] = [
   // ---- enumerations -------------------------------------------------------
   [/\.dtd\.syncType$|\.dtd\d*\.syncType$|\bsyncType$/, { control: "select", options: SYNC_TYPE }],
   [/\bstereo$/, { control: "select", options: STEREO }],
-  [/\bsyncFlags$/, { control: "number", min: 0, max: 3 }],
   [/^base\.features\.colorType$/, { control: "select", options: COLOR_TYPE }],
   [/^base\.input\.bitDepth$/, { control: "select", options: BIT_DEPTH }],
   [/^base\.input\.interface$/, { control: "select", options: VIDEO_INTERFACE }],
@@ -110,11 +109,19 @@ const RULES: [RegExp, FieldInput][] = [
 
   // ---- coded: a raw code whose physical meaning is non-linear -------------
   [/\.minLum1$/, { control: "coded", min: 0, max: 255, unit: "cd/m²" }],
-  [/\.(maxLum|avgLum|minLum)$/, { control: "coded", min: 0, max: 255, unit: "cd/m²" }],
-  [/^base\.chroma\.(red|green|blue|white)[XY]$/, { control: "coded", min: 0, max: 1023, unit: "CIE" }],
+
+  // ---- HDR Static Metadata luminance: decoded value and raw code, both ----
+  // editable and both writing the same byte (see hdr.ts). The decoded value
+  // has no independently-known numeric range — the code (0-255) does.
+  [/^cta\d+\.ext6\.(maxLum|avgLum|minLum)$/, { control: "number", unit: "cd/m²" }],
+  [/^cta\d+\.ext6\.(maxLumCode|avgLumCode|minLumCode)$/, { control: "number", min: 0, max: 255 }],
+
+  // ---- chromaticity: decoded CIE value and raw 10-bit code, both editable -
+  [/^base\.chroma\.(red|green|blue|white)[XY]$/, { control: "number", min: 0, max: 0.999, unit: "CIE" }],
+  [/^base\.chroma\.(red|green|blue|white)[XY]Code$/, { control: "number", min: 0, max: 1023 }],
 
   // ---- numbers with a range we can state independently --------------------
-  [/^base\.productCode$/, { control: "number", min: 0, max: 0xffff }],
+  [/^base\.productCode$/, { control: "hex", bytes: 2 }],
   [/^base\.serialNumber$/, { control: "number", min: 0, max: 0xffffffff }],
   [/^base\.week$/, { control: "number", min: 0, max: 54 }],
   [/^base\.year$/, { control: "number", min: 1990, max: 2245 }],
@@ -192,7 +199,7 @@ const READ_ONLY_REASONS: [RegExp, string][] = [
     "The block's descriptor-size knob. It is derived from the entries, which are edited individually."],
   [/^cta\d+\.revision$/,
     "Protected. Below revision 3 the encoder drops the entire data block collection, so changing this would silently delete every block."],
-  [/\.(sad|svd)\.count$|^did\d+\.blockCount$/,
+  [/^did\d+\.blockCount$/,
     "Derived from the list. Use the count stepper on the group row to add or remove entries."],
   [/^cta\d+\.speakerAlloc$/,
     "A display of the speaker flags below — edit those."],

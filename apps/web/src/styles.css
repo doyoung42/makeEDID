@@ -107,7 +107,7 @@ code {
 .body { display: flex; flex: 1; min-height: 0; }
 
 .sidebar {
-  width: 280px;
+  /* width comes from inline style (draggable, see App.tsx) */
   flex-shrink: 0;
   border-right: 1px solid var(--border);
   background: var(--bg-sunken);
@@ -115,6 +115,14 @@ code {
   display: flex;
   flex-direction: column;
 }
+.sidebar-resize {
+  flex-shrink: 0;
+  width: 5px;
+  margin-left: -3px;
+  cursor: col-resize;
+  z-index: 1;
+}
+.sidebar-resize:hover { background: var(--accent); opacity: 0.4; }
 .sidebar-head {
   display: flex;
   align-items: center;
@@ -206,10 +214,14 @@ code {
 
 /* ------------------------------------------------------------------ matrix */
 
-table.matrix { border-collapse: separate; border-spacing: 0; font-size: 13px; width: 100%; }
-table.matrix.fit { table-layout: fixed; }
-
-col.field-col-group { width: 280px; }
+/*
+ * `.fit` (no manual resize yet) is the only state that gets `width: 100%` —
+ * that's what makes columns share the available width evenly. Once a column
+ * has an explicit width (first drag), the table is sized by its columns
+ * instead (`table-layout: fixed` always applies; only the outer width toggles).
+ */
+table.matrix { border-collapse: separate; border-spacing: 0; font-size: 13px; table-layout: fixed; }
+table.matrix.fit { width: 100%; }
 
 table.matrix th, table.matrix td {
   border-right: 1px solid var(--border);
@@ -232,6 +244,19 @@ table.matrix thead th {
   overflow: visible;
   white-space: normal;
 }
+
+/* A resize handle anchors to its header cell's right edge (already `position:
+   sticky`, which establishes a positioning context same as `relative` would). */
+.col-resize {
+  position: absolute;
+  top: 0;
+  right: -3px;
+  bottom: 0;
+  width: 6px;
+  cursor: col-resize;
+  z-index: 5;
+}
+.col-resize:hover { background: var(--accent); opacity: 0.4; }
 
 table.matrix th.field-col,
 table.matrix td.field-col {

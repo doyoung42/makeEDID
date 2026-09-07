@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
 import type { SpecField, ByteSpan } from "@edid/core";
 import {
   isFieldEditable, buildFieldTree, flattenTree,
@@ -42,11 +42,14 @@ export interface MatrixViewProps {
   structure: {
     canAdd: (col: number, path: string) => boolean;
     canRemove: (col: number, path: string) => boolean;
+    canMove: (col: number, path: string, direction: "up" | "down") => boolean;
     onAdd: (col: number, path: string) => void;
     onRemove: (col: number, path: string) => void;
+    onMove: (col: number, path: string, direction: "up" | "down") => void;
     onSetCount: (col: number, path: string, n: number) => void;
     onAddExtension: (col: number) => void;
   };
+  onExport: (col: number) => void;
 }
 
 interface Row {
@@ -77,6 +80,61 @@ export function MatrixView(props: MatrixViewProps) {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   /** Until the user touches a twisty, the tree folds itself (see defaultCollapsed). */
   const [autoCollapse, setAutoCollapse] = useState(true);
+
+  // ---------------------------------------------------------- column width
+  // Empty `colWidths` means "no manual resize yet" — the table stays at
+  // `width: 100%` with `table-layout: fixed` and no explicit `<col>` widths,
+  // which is what makes the browser auto-distribute evenly (the good default
+  // the fit-only version already had). The first drag freezes every column's
+  // *current* rendered width into this map in one shot; from then on the
+  // table has explicit widths for every column and stops being 100%-wide, so
+  // dragging one column never fights the others for space.
+  const [colWidths, setColWidths] = useState<Record<string, number>>({});
+  const [fieldColWidth, setFieldColWidth] = useState(280);
+  const tableRef = useRef<HTMLTableElement | null>(null);
+  const MIN_COL_WIDTH = 90;
+
+  const startColumnResize = (e: ReactMouseEvent, path: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    let widths = colWidths;
+    if (Object.keys(widths).length === 0) {
+      widths = {};
+      tableRef.current?.querySelectorAll<HTMLElement>("thead th[data-col]").forEach((th) => {
+        const key = th.dataset.col;
+        if (key) widths[key] = th.getBoundingClientRect().width;
+      });
+      setColWidths(widths);
+    }
+    const startWidth = widths[path] ?? 170;
+    const startX = e.clientX;
+    const onMouseMove = (ev: MouseEvent) => {
+      const w = Math.max(MIN_COL_WIDTH, startWidth + (ev.clientX - startX));
+      setColWidths((prev) => ({ ...prev, [path]: w }));
+    };
+    const onMouseUp = () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  };
+
+  const startFieldColResize = (e: ReactMouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const startWidth = fieldColWidth;
+    const startX = e.clientX;
+    const onMouseMove = (ev: MouseEvent) => {
+      setFieldColWidth(Math.max(MIN_COL_WIDTH, startWidth + (ev.clientX - startX)));
+    };
+    const onMouseUp = () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  };
 
   const rows = useMemo<Row[]>(() => {
     const perColumn = fieldsByColumn.map((fs) => new Map(fs.map((f) => [f.path, f])));
@@ -211,6 +269,13 @@ export function MatrixView(props: MatrixViewProps) {
         >
           Add extension…
         </button>
+        <button
+          disabled={Object.keys(colWidths).length === 0}
+          onClick={() => setColWidths({})}
+          title="Return every column to sharing the available width evenly"
+        >
+          Reset widths
+        </button>
         <button onClick={() => {
           setAutoCollapse(false);
           setCollapsed(new Set(rows.filter((r) => r.hasChildren).map((r) => r.path)));
@@ -230,21 +295,32 @@ export function MatrixView(props: MatrixViewProps) {
 
       <div className="scroll">
         {/*
-          * Columns always share the available width. A manual mode existed here
-          * but could not work: `table.matrix` is `width: 100%` with
-          * `table-layout: fixed`, so the browser rescales any explicit column
-          * width back to fill the table.
+          * `colWidths` empty = every column shares the available width evenly
+          * (`.fit`, `width: 100%`). The first drag freezes the live widths into
+          * `colWidths` (see `startColumnResize`) and the table switches to
+          * explicit per-column widths, sized by its columns rather than by the
+          * container — that's what a manual resize needs, and it cannot fight
+          * `width: 100%` because `width: 100%` is only applied in `.fit` mode.
           */}
-        <table className="matrix fit">
+        <table ref={tableRef} className={`matrix${Object.keys(colWidths).length === 0 ? " fit" : ""}`}>
           <colgroup>
-            <col className="field-col-group" />
-            {columns.map((c) => <col key={c.path} />)}
+            <col style={{ width: fieldColWidth }} />
+            {columns.map((c) => (
+              <col key={c.path} style={colWidths[c.path] ? { width: colWidths[c.path] } : undefined} />
+            ))}
           </colgroup>
           <thead>
             <tr>
-              <th className="field-col">Spec field</th>
+              <th className="field-col">
+                Spec field
+                <span
+                  className="col-resize"
+                  title="Drag to resize"
+                  onMouseDown={startFieldColResize}
+                />
+              </th>
               {columns.map((c, i) => (
-                <th key={c.path} className={i === props.focused ? "focused" : undefined}>
+                <th key={c.path} data-col={c.path} className={i === props.focused ? "focused" : undefined}>
                   <div className="col-head">
                     <button
                       className="name"
@@ -267,9 +343,15 @@ export function MatrixView(props: MatrixViewProps) {
                       <button onClick={() => props.setBaseline(i)} disabled={i === baseline} title="Use as baseline">Base</button>
                       <button onClick={() => props.onSave(i)} disabled={!c.dirty} title="Save this model">Save</button>
                       <button onClick={() => props.onRevert(i)} disabled={!c.dirty} title="Discard changes">Revert</button>
+                      <button onClick={() => props.onExport(i)} title="Export this model as .ddc / .xml / .txt">Export</button>
                       <button onClick={() => props.onClose(i)} title="Close this column">×</button>
                     </div>
                   </div>
+                  <span
+                    className="col-resize"
+                    title="Drag to resize"
+                    onMouseDown={(e) => startColumnResize(e, c.path)}
+                  />
                 </th>
               ))}
             </tr>
@@ -313,6 +395,24 @@ export function MatrixView(props: MatrixViewProps) {
                           onClick={(e) => { e.stopPropagation(); props.structure.onRemove(props.focused, row.path); }}
                         >
                           ✕
+                        </button>
+                      )}
+                      {props.structure.canMove(props.focused, row.path, "up") && (
+                        <button
+                          className="struct move"
+                          title={"Move up in " + focusedName}
+                          onClick={(e) => { e.stopPropagation(); props.structure.onMove(props.focused, row.path, "up"); }}
+                        >
+                          ▲
+                        </button>
+                      )}
+                      {props.structure.canMove(props.focused, row.path, "down") && (
+                        <button
+                          className="struct move"
+                          title={"Move down in " + focusedName}
+                          onClick={(e) => { e.stopPropagation(); props.structure.onMove(props.focused, row.path, "down"); }}
+                        >
+                          ▼
                         </button>
                       )}
                       {row.editable && columns.length > 1 && (

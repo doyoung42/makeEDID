@@ -24,6 +24,10 @@ import { decodeEdid, encodeEdid } from "../packages/edid-core/dist/index.js";
 import { flattenEdid } from "../packages/edid-core/dist/flatten.js";
 import { applyField, isFieldEditable } from "../packages/edid-core/dist/applyField.js";
 import { readOnlyReason, describeInput } from "../packages/edid-core/dist/inputs.js";
+import {
+  hdrMaxAvgLuminanceCdm2, hdrMaxAvgLuminanceCode,
+  hdrMinLuminanceCdm2, hdrMinLuminanceCode,
+} from "../packages/edid-core/dist/hdr.js";
 import { createBlankEdid } from "../packages/edid-core/dist/template.js";
 import {
   addExtension, addCtaBlock, addCtaDtd, addDisplayIdBlock, setDescriptorKind,
@@ -90,9 +94,65 @@ const QUANTUM = [
  * cross-checks `describeInput` against the writer: if the registry offers a
  * value the writer refuses, this sweep is where it shows up.
  */
-function perturb(field) {
+/**
+ * HDR Static Metadata's decoded luminance fields (cd/m²) are read *and*
+ * written through an 8-bit code, so most cd/m² values are not exactly
+ * representable — a blind "-1" nudge lands on an unrelated value and looks
+ * like the edit vanished. Perturbing in the *code* domain and decoding back
+ * always lands on a value that is exactly representable, so it verifies the
+ * real thing (the round-trip) instead of an artifact of picking a bad delta.
+ */
+function perturbHdrLuminance(field, fields) {
+  const m = /^(cta\d+\.ext\d+)\.(maxLum|avgLum|minLum)$/.exec(field.path);
+  if (!m) return undefined;
+  const [, base, which] = m;
+
+  // flatten.ts rounds every decoded luminance to 2 decimals; matching that
+  // here is what makes the read-back value compare equal by exact string,
+  // the same way every other field in this sweep is checked.
+  const round2 = (n) => Math.round(n * 100) / 100;
+
+  if (which !== "minLum") {
+    const code = hdrMaxAvgLuminanceCode(field.value);
+    const nextCode = code > 0 ? code - 1 : 1;
+    return round2(hdrMaxAvgLuminanceCdm2(nextCode));
+  }
+  // Min needs the sibling max code, which the writer itself reads from the
+  // live payload — here there is only the flattened row, so read it from there.
+  const maxCode = fields.find((x) => x.path === base + ".maxLumCode")?.value;
+  if (typeof maxCode !== "number") return null;
+  const code = hdrMinLuminanceCode(field.value, maxCode);
+  const nextCode = code > 0 ? code - 1 : 1;
+  return round2(hdrMinLuminanceCdm2(nextCode, maxCode));
+}
+
+/**
+ * Chromaticity's decoded coordinate (e.g. `base.chroma.redX`) is, like the HDR
+ * luminance fields, a value shown as a formatted *string* (`"0.6445"`, 4
+ * decimals) even though `kind` says "number" — the same convention
+ * `base.gamma`'s "defined by DI-EXT" uses for a special case. `perturb`
+ * dispatches on `typeof v`, so a numeric-looking string needs its own branch
+ * or it falls through to the hex/string handling and never gets exercised.
+ * Stepping in the *code* domain (its sibling `...Code` field) and formatting
+ * with the same `/1024` + 4-decimal rule flatten.ts uses guarantees an exact
+ * match on read-back, the same reasoning as the HDR case above.
+ */
+function perturbChromaDecoded(field) {
+  const m = /^base\.chroma\.(redX|redY|greenX|greenY|blueX|blueY|whiteX|whiteY)$/.exec(field.path);
+  if (!m) return undefined;
+  const code = Math.round(parseFloat(field.value) * 1024);
+  const nextCode = code > 0 ? code - 1 : 1;
+  return (nextCode / 1024).toFixed(4);
+}
+
+function perturb(field, fields) {
   const v = field.value;
   if (typeof v === "boolean") return !v;
+
+  const hdr = perturbHdrLuminance(field, fields);
+  if (hdr !== undefined) return hdr;
+  const chroma = perturbChromaDecoded(field);
+  if (chroma !== undefined) return chroma;
 
   const input = describeInput(field.path, field.kind);
 
@@ -106,8 +166,13 @@ function perturb(field) {
     if (q) return v > q[1] ? v - q[1] : v + q[1];
     if ((input?.control === "number" || input?.control === "coded")
       && input.min !== undefined && input.max !== undefined) {
-      // Stay inside the declared range, which a blind -1 often leaves.
-      return v > input.min ? v - 1 : Math.min(v + 1, input.max);
+      // Stay inside the declared range, which a blind -1 often leaves — a
+      // chromaticity coordinate (0-0.999) is well inside "v > min" for most
+      // real values, but v-1 still lands far below min.
+      const down = v - Math.min(1, v - input.min);
+      if (down >= input.min && down !== v) return down;
+      const up = v + Math.min(1, input.max - v);
+      return up <= input.max && up !== v ? up : null;
     }
     return Number.isInteger(v) && v > 0 ? v - 1 : v + 1;
   }
@@ -187,7 +252,7 @@ function sweep(label, template, bytesOf) {
     b.editable.add(key);
     if (b.verified.has(key)) continue;
 
-    const next = perturb(f);
+    const next = perturb(f, fields);
     if (next === null) continue;
 
     // Work on a fresh copy so one field's edit cannot mask another's.
